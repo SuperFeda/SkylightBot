@@ -1,0 +1,35 @@
+{
+    "common_code": {
+        "723trWe6E1": {
+            "discount_rate": 50,
+            "count_for_use": 0
+        },
+        "723tr6Tre2": {
+            "discount_rate": 10,
+            "count_for_use": 8
+        },
+        "1334567890": {
+            "discount_rate": 22,
+            "count_for_use": 8
+        },
+        "AlikGaming": {
+            "discount_rate": 0,
+            "count_for_use": 7
+        }
+    },
+    "youtube_code": {
+        "5SkylightService5": {
+            "discount_rate": 30,
+            "count": 2
+        },
+        "GGTTYY1122SSAA88I": {
+            "discount_rate": 22,
+            "count_for_use": 8,
+            "count": 1,
+            "users": [
+                422414746591952910,
+                875246294044643371
+            ]
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "worker_role_id": 1130086992999354388,
+
+    "orders_category_id": 1159115812586668144,
+    "requests_category_id": 1193829128449830932,
+
+    "worker_order_channel_id": 1130521980936921200,
+    "order_channel_id": 1130092027942555740,
+    "report_channel_id": 1184406094907453440,
+    "log_channel_id": 1169903921792286771,
+    "request_channel_id": 1193817240626286592
+}

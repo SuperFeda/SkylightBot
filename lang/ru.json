@@ -1,0 +1,42 @@
+{
+  "send_report.display_name": "отправить_репорт",
+  "send_report.description": "Уведомить сотрудников об ошибке в сервисе",
+  "send_report.message.name": "сообщение",
+  "send_report.message.description": "Ваше сообщение:",
+  "send_report.report_type.name": "тип_жалобы",
+  "send_report.report_type.description": "Выберите тип жалобы:",
+  "send_report.error_message_choice": "Сообщение об ошибке",
+  "send_report.employee_message_choice": "Жалоба на сотрудника",
+  "send_report.ctx_message": "Репорт отправлен",
+  "send_report.report_channel.embed.title": "Репорт:",
+  "send_report.report_channel.embed.field": "Тип репорта:",
+
+  "edit_all_worker_salary.display_name": "ред зарплату всех сотрудников",
+  "edit_all_worker_salary.description": "Выставить всем сотрудникам одну зарплату",
+  "edit_all_worker_salary.sure.description": "Вы согласны?",
+  "edit_all_worker_salary.true_choice": "Да",
+  "edit_all_worker_salary.false_choice": "Нет",
+
+  "description.display_name": "описание",
+  "description.description.name": "описание",
+  "description.description": "Опишите реализацию заказа",
+  "description.images.name": "изображения",
+  "description.images.description": "Оставьте здесь ссылку на изображения на основе которых нужно выполнить заказ, если они имеются",
+  "description.description.description": "Напишите здесь: как вы хотите видеть итог заказа",
+
+  "additional_contacts.display_name": "дополнительные_контакты",
+  "additional_contacts.description": "Предоставьте дополнительные контакты для связи с вами",
+  "additional_contacts.email_address": "электронная_почта",
+  "additional_contacts.telegram_url": "телеграм",
+  "additional_contacts.vk_url": "вк",
+
+  "archive.display_name": "архив",
+  "archive.description": "Отправить запрос на покупку товара из архива или предложение о добавлении",
+  "archive.product_name.name": "имя_продукта",
+  "archive.product_name.description": "Имя желаемого продукта:",
+  "archive.request_type.name": "тип_запроса",
+  "archive.request_type.description": "Выберите к какому типу относится ваш запрос:",
+
+  "place_an_order.name": "оформить_заказ",
+  "place_an_order.description": "Команда для оформления заказа в любом канале"
+}
