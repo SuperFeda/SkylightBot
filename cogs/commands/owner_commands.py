@@ -1,10 +1,10 @@
-import disnake, sqlite3
+import disnake, sqlite3, json
 from disnake.ext import commands
 from disnake import Localized
 
 from ssbot import BOT, SSBot
-from cogs.hadlers import handlers, bot_choices
-from cogs.view.service_select import ServiceSelectView
+from cogs.hadlers import utils, bot_choices
+from cogs.view.buttons.order_message_buttons import OrderMessageButtons
 
 
 class OwnerCommands(commands.Cog):
@@ -17,31 +17,18 @@ class OwnerCommands(commands.Cog):
         if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
             return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
 
-        embed = disnake.Embed(title="SkylightServices", color=disnake.Color.blurple())
-        embed.add_field(
-            name="Посмотреть список услуг: <#1130088587661148290>\nОтзывы: <#1130088521718300682>\n\n**Перед оформлением заказа не забудьте прочитать пользовательское соглашение в канале** <#1169299255597469696>",
-            value=""
-        )
-
-        superfeda = BOT.get_user(875246294044643371)
-
-        file = disnake.File("SkylightServices_new.png", filename="image.jpg")
-        embed.set_image(url="attachment://image.jpg")
-        embed.set_footer(
-            text=f"{superfeda.display_name}: Вы автоматически соглашаетесь с пользовательским соглашением после оформления заказа",
-            icon_url=superfeda.avatar
-        )
-
         ORDER_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["order_channel_id"])
 
-        await ORDER_CHANNEL.send(embed=embed, file=file, view=ServiceSelectView(self.client))
+        embed = disnake.Embed(title="Здароу, я SkylightBot", color=disnake.Color.blurple())
+        embed.add_field(name="С моей помощью вы сможете полностью оформить заказ: выбор услуги и описание - со всем этим буду помогать я.\nДля начала заполнения нажмите на кнопку \"Оформить заказ\".", value="")
+        await ORDER_CHANNEL.send(embed=embed, view=OrderMessageButtons(self.client))
 
     @commands.slash_command(name="get_salary_list")
     async def get_salary_list(self, ctx):
         if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
             return await ctx.send("У вас нет прав на использование этой команды", ephemeral=True)
 
-        connection = sqlite3.connect('data/skylightbot_worker_base.db')
+        connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM settings")
         result = cursor.fetchall()
@@ -58,7 +45,7 @@ class OwnerCommands(commands.Cog):
         if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
             return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
 
-        connection = sqlite3.connect('data/skylightbot_worker_base.db')
+        connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM settings")
         result = cursor.fetchall()
@@ -82,7 +69,7 @@ class OwnerCommands(commands.Cog):
         if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
             return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
 
-        connection = sqlite3.connect('data/skylightbot_worker_base.db')
+        connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
         user_id = worker.id
         cursor.execute("SELECT worker_salary FROM settings WHERE user_id=?", (user_id,))
@@ -90,7 +77,7 @@ class OwnerCommands(commands.Cog):
         var_worker_salary = result[0] if result else None
         connection.close()
 
-        connection = sqlite3.connect('./data/skylightbot_worker_base.db')
+        connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
         user_id = worker.id
         cursor.execute(
@@ -112,7 +99,7 @@ class OwnerCommands(commands.Cog):
         if sure is False or sure is None:
             return await ctx.send(f"{sure = }", ephemeral=True)
 
-        connection = sqlite3.connect('./data/skylightbot_worker_base.db')
+        connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM settings")
         result = cursor.fetchall()
@@ -123,7 +110,7 @@ class OwnerCommands(commands.Cog):
         for item in result:
             embed.add_field(name=f"Зарплата {item[3]} ({item[2]}) изменена с {item[1]}₽ на {salary}₽", value='', inline=False)
 
-            connection = sqlite3.connect('./data/skylightbot_worker_base.db')
+            connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
             cursor = connection.cursor()
             user_id = item[0]
             cursor.execute(
@@ -147,7 +134,7 @@ class OwnerCommands(commands.Cog):
         if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
             return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
 
-        pc_data = handlers.read_json(path="data\\promo_codes.json")
+        pc_data = utils.read_json(path="data\\promo_codes.json")
 
         if pc_type == "common_code":
             if len(promo_code_name) != 10:
@@ -175,7 +162,7 @@ class OwnerCommands(commands.Cog):
 
             pc_data["youtube_code"].update({promo_code_name: {"discount_rate": discount_rate, "count": count-1}})
 
-        handlers.write_json(path="data\\promo_codes.json", data=pc_data)
+        utils.write_json(path="data\\promo_codes.json", data=pc_data)
 
         await ctx.send(f"Промокод **{promo_code_name}** добавлен в базу данных в категорию \"{pc_type}\".", ephemeral=True)
 
@@ -184,15 +171,16 @@ class OwnerCommands(commands.Cog):
         if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
             return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
 
-        pc_data = handlers.read_json(path="data\\promo_codes.json")
+        pc_data = utils.read_json(path="data\\promo_codes.json")
         pc_data[pc_type].pop(promo_code_name)
-        handlers.write_json(path="data\\promo_codes.json", data=pc_data)
+        utils.write_json(path="data\\promo_codes.json", data=pc_data)
 
         await ctx.send(f"Промокод {promo_code_name} удален из базы данных.", ephemeral=True)
 
-    # @commands.slash_command(name="menu")  # command for check promo code modal menu
-    # async def menu(self, ctx: disnake.AppCmdInter):
-    #     await ctx.response.send_modal(modal=PromoCodeEnter(self.client))
+    @commands.slash_command(name="stop_take_order")
+    async def take_order_order(self, ctx, true_false: bool = commands.Param(choices=bot_choices.CHOICE_FOR_SURE)):
+        SSBot.BOT_CONFIG["bot_can_take_order"] = true_false
+        await ctx.send(f"bot_can_take_order заменено на {true_false}.", ephemeral=True)
 
 
 def setup(client):

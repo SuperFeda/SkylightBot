@@ -1,11 +1,9 @@
-import disnake, sqlite3, os, shutil
+import disnake, sqlite3, os
 from disnake.ext import commands
 from colorama import Fore
 
 from ssbot import BOT, SSBot
-from cogs.hadlers import handlers
-from cogs.view.service_select import ServiceSelectView
-# from cogs.view.buttons.continue_button import ContinueButton
+from cogs.hadlers import utils
 from cogs.view.buttons.order_message_buttons import OrderMessageButtons
 from cogs.view.buttons.continue_and_adtcon_buttons import ContinueAndAdtConButtons
 
@@ -41,7 +39,7 @@ class BotEvents(commands.Cog):
 
             def is_not_bot(m):
                 return not m.author.bot
-            await message.channel.purge(check=is_not_bot)
+            await message.channel.purge(check=is_not_bot)  # Удаление сообщений в новосозданной ветке
 
             if len(message.attachments) > 10:
                 return await message.send("Отправить можно максимум 10 изображений.", delete_after=2)
@@ -49,37 +47,27 @@ class BotEvents(commands.Cog):
                 return await message.send("Описание должно вмещать в себя до **349** символов.", delete_after=2)
 
             async with message.channel.typing():
-                if message.author.name in os.listdir("cache/"):
-                    for file in os.listdir(f"cache/{message.author.name}/"):
-                        os.remove(f"cache/{message.author.name}/{file}")
-                    os.rmdir(f"cache/{message.author.name}")
+                if message.author.name in os.listdir("cache/"):  # если папка с именем пользователя уже есть в папке с кешем, то удалить ее и ее содержимое
+                    utils.delete_files_from_cache(author_name=message.author.name)
 
                 if len(message.attachments) > 0:
                     for image in message.attachments:
                         img_fln = image.filename[-5:]
+                        # если файл имеет не разрешенный формат, то не сохранять его
                         if ".png" not in img_fln and ".jpeg" not in img_fln and ".gif" not in img_fln and ".jpg" not in img_fln:
                             pass
                         else:
                             try:
-                                os.mkdir(f"cache/{message.author.name}/")
+                                os.mkdir(f"cache/{message.author.name}/")  # создание папки с именем пользователя в кеше
                             except FileExistsError:
                                 pass
                             await image.save(f"cache/{message.author.name}/{image.filename}")
 
-                    pictures = handlers.get_files(f"cache/{message.author.name}/")
-
-                    # picture_for_send = []
-                    # for image_for_send in os.listdir(f"cache/{message.author.name}/"):
-                    #     picture_for_send.append(disnake.File(f"cache/{message.author.name}/{image_for_send}"))
+                    pictures = utils.get_files(f"cache/{message.author.name}/")  # получение сохраненных фотографий из кеша
 
                 embed = disnake.Embed(title="Проверка описания", color=SSBot.DEFAULT_COLOR)
                 embed.add_field(
-                    name=f"Проверьте введенное вами описание и прикрепленные фотографии (при наличии): **{message.content}**",
-                    value="",
-                    inline=False
-                )
-                embed.add_field(
-                    name="Если вы можете предоставить дополнительные контакты для связи то нажмите на кнопку \"Доп. контакты\"",
+                    name=f"Проверьте введенное вами описание и прикрепленные фотографии (при наличии): **{message.content}**\n\nПри наличии ошибок повторно отправьте текст с описанием.\n\nЕсли вы можете предоставить дополнительные контакты для связи то нажмите на кнопку \"Доп. контакты\"",
                     value="",
                     inline=False
                 )
@@ -96,7 +84,7 @@ class BotEvents(commands.Cog):
         LOG_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["log_channel_id"])
 
         if message.author != BOT.user:                 # отправка сообщений от всех пользователей в LOG_CHANNEL, если id канала, где
-            if message.channel.id in BANNED_CHANNELS:  # было опубликованно сообщение не находится в banned_channels и автор сообщения не бот
+            if message.channel.id in BANNED_CHANNELS:  # было опубликованно сообщение не находится в banned_channels и автор сообщения не SSBot
                 return
             embed = disnake.Embed(title="Сообщение")
             embed.add_field(name=f'"**{message.channel.name}**" :>> {message.content}.', value="")

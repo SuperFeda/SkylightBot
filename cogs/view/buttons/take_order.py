@@ -2,7 +2,7 @@ import disnake, sqlite3
 from disnake.ext import commands
 
 from ssbot import SSBot
-from cogs.hadlers import dicts, handlers
+from cogs.hadlers import dicts, utils
 
 
 def for_in_embed(in_: dict) -> str:
@@ -82,12 +82,12 @@ class TakeOrder(disnake.ui.View):
             var_worker_salary = result_[0] if result else None
 
             if flag:
-                var_worker_salary = int(var_worker_salary) + handlers.calc_percentage(promo_code=enter_promo_code_from_embed, price=dicts.SERVICE_PRICES[service_type_from_embed])
+                var_worker_salary = int(var_worker_salary) + utils.calc_percentage(promo_code=enter_promo_code_from_embed, price=dicts.SERVICE_PRICES[service_type_from_embed])
             else:
                 var_worker_salary = int(var_worker_salary) + dicts.SERVICE_PRICES[service_type_from_embed]
 
             connection_.close()
-            handlers.var_test(var_worker_salary)
+            utils.var_test(var_worker_salary)
             connection_ = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
             cursor_ = connection_.cursor()
             cursor_.execute(
@@ -99,10 +99,10 @@ class TakeOrder(disnake.ui.View):
 
         except TypeError:  # else:
             if flag:
-                var_worker_salary_2 = handlers.calc_percentage(promo_code=enter_promo_code_from_embed, price=dicts.SERVICE_PRICES[service_type_from_embed])
+                var_worker_salary_2 = utils.calc_percentage(promo_code=enter_promo_code_from_embed, price=dicts.SERVICE_PRICES[service_type_from_embed])
             else:
                 var_worker_salary_2 = dicts.SERVICE_PRICES[service_type_from_embed]
-            handlers.var_test(var_worker_salary_2)
+            utils.var_test(var_worker_salary_2)
             connection_ = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
             cursor_ = connection_.cursor()
             cursor_.execute(

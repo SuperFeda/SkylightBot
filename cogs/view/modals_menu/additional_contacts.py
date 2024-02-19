@@ -52,9 +52,9 @@ class AdditionalContactsMenu(disnake.ui.Modal):
         from cogs.view.buttons.continue_and_adtcon_buttons import ContinueAndAdtConButtons
 
         async with ctx.channel.typing():
-            vk_url_from_mm = ctx.text_values["vk_url"]
-            tg_url_from_mm = ctx.text_values["tg_url"]
-            mail_address_from_mm = ctx.text_values["mail_address"]
+            vk_url_from_mm = ctx.text_values["vk_url"]               # Получение данных
+            tg_url_from_mm = ctx.text_values["tg_url"]               # из TextInput
+            mail_address_from_mm = ctx.text_values["mail_address"]   # из AdditionalContactsMenu
 
             embed = disnake.Embed(title="Доп. контакты", color=SSBot.DEFAULT_COLOR)
             embed.add_field(name="Проверьте, все ли данные введены верно:", value="")

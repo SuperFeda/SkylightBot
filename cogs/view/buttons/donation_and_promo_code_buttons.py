@@ -1,8 +1,8 @@
-import disnake, sqlite3, os
+import disnake, sqlite3
 from disnake.ext import commands
 
 from ssbot import SSBot, BOT
-from cogs.hadlers import handlers, dicts
+from cogs.hadlers import utils, dicts
 from cogs.view.buttons.take_order import TakeOrder
 from cogs.view.modals_menu.promo_code_enter import PromoCodeEnterMenu
 
@@ -98,7 +98,7 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
 
         connection.close()
 
-        color = handlers.color_order(var_service_type)
+        color = utils.color_order(var_service_type)  # получение цвета для embed
 
         order_embed = disnake.Embed(title='Новый заказ:', color=color)
         order_embed.add_field(
@@ -153,7 +153,7 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
         cash_for_pay = ""
         if var_active_promo_code is not None:
             percentage = 0
-            file = handlers.read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)
+            file = utils.read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)
 
             if len(var_active_promo_code) == 10:
                 connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
@@ -170,7 +170,7 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
             elif len(var_active_promo_code) == 17:
                 percentage = file["youtube_code"][var_active_promo_code]["discount_rate"]
 
-            cash_for_pay = f"\nТ.к. вы использовали промокод {var_active_promo_code} на скидку {percentage}%, то оплата будет в резмере {int(handlers.calc_percentage(promo_code=var_active_promo_code, price=dicts.SERVICE_PRICES[var_service_type]))}₽."
+            cash_for_pay = f"\nТ.к. вы использовали промокод {var_active_promo_code} на скидку {percentage}%, то оплата будет в резмере {int(utils.calc_percentage(promo_code=var_active_promo_code, price=dicts.SERVICE_PRICES[var_service_type]))}₽."
 
         if var_service_type in SSBot.NOT_STATIC_PRICE:
             pay_message = "Ваш заказ был отправлен сотрудникам SkylightServices."
@@ -182,13 +182,11 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
         embed.add_field(name="".join([pay_message, cash_for_pay]), value="")
 
         try:
-            pictures = handlers.get_files(f"cache/{ctx.author.name}/")
+            pictures = utils.get_files(f"cache/{ctx.author.name}/")
 
             await WORKER_ORDER_CHANNEL.send(embed=order_embed, view=TakeOrder(self.bot), files=pictures)
 
-            for file in os.listdir(f"cache/{ctx.author.name}/"):
-                os.remove(f"cache/{ctx.author.name}/{file}")
-            os.rmdir(f"cache/{ctx.author.name}")
+            utils.delete_files_from_cache(author_name=ctx.author.name)
         except FileNotFoundError:
             await WORKER_ORDER_CHANNEL.send(embed=order_embed, view=TakeOrder(self.bot))
 

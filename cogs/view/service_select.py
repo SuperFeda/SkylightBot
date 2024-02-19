@@ -2,7 +2,7 @@ import disnake, json, datetime, sqlite3
 from disnake.ext import commands
 
 from ssbot import SSBot
-from cogs.hadlers import handlers, dicts
+from cogs.hadlers import utils, dicts
 
 
 class ServiceSelectReg(commands.Cog):
@@ -16,7 +16,6 @@ class ServiceSelectReg(commands.Cog):
 
 
 class ServiceSelect(disnake.ui.StringSelect):
-
     def __init__(self):
         super().__init__(
             placeholder="Список услуг", min_values=1, max_values=1,
@@ -49,36 +48,33 @@ class ServiceSelect(disnake.ui.StringSelect):
 
         async with ctx.channel.typing():
 
-            with open(SSBot.PATH_TO_CODES, 'r') as file:
+            with open(SSBot.PATH_TO_CODES, 'r') as file:  # загрузка файла с кодами заказов
                 try:
                     codes = json.load(file)
                 except json.JSONDecodeError:
                     codes = []
 
-            combination = handlers.generate_random_combination(10)
+            combination = utils.generate_random_combination(10)  # генерация и сохранение кода заказа
             for element in codes:
                 if combination in element:
-                    combination = handlers.generate_random_combination(10)
+                    combination = utils.generate_random_combination(10)
                     continue
                 else:
                     break
             codes.append({"code": combination})
 
-            with open(SSBot.PATH_TO_CODES, 'w') as file:
+            with open(SSBot.PATH_TO_CODES, 'w') as file:  # сохранение файла с кодами заказа
                 json.dump(codes, file)
 
             current_time = datetime.datetime.now()
             order_code = combination.replace("}", "").replace("{", "")
-            order_time = current_time.strftime("%d.%m.%Y")
+            order_time = current_time.strftime("%d.%m.%Y")  # получение даты оформления заказа
 
             connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
             cursor = connection.cursor()
-
-            # activated_promo_codes_list
             cursor.execute("SELECT activated_promo_codes_list FROM settings WHERE user_id=?", (ctx.author.id,))
             result = cursor.fetchone()
             activated_promo_codes_list_var = result[0] if result else None
-
             connection.close()
 
             if activated_promo_codes_list_var is None:
@@ -93,7 +89,7 @@ class ServiceSelect(disnake.ui.StringSelect):
 
             connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
             cursor = connection.cursor()
-            try:
+            try:  # если у пользователя есть аватар, то тогда ссылка на него сохранится в переменную
                 author_avatar = str(ctx.author.avatar.url)
             except AttributeError:
                 author_avatar = None

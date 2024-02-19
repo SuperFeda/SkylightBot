@@ -8,5 +8,7 @@
     "order_channel_id": 1130092027942555740,
     "report_channel_id": 1184406094907453440,
     "log_channel_id": 1169903921792286771,
-    "request_channel_id": 1193817240626286592
+    "request_channel_id": 1193817240626286592,
+
+    "bot_can_take_order": true
 }

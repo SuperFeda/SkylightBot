@@ -2,7 +2,7 @@ import disnake, sqlite3
 from disnake.ext import commands
 
 from ssbot import SSBot
-from cogs.hadlers import handlers
+from cogs.hadlers import utils
 
 
 # Класс для регистрации этого файла как кога, чтобы его можно было загрузить в main
@@ -34,7 +34,7 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
         )
 
     async def callback(self, ctx):
-        promo_codes_data = handlers.read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)  # подгрузка файла с данными о промокодами
+        promo_codes_data = utils.read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)  # подгрузка файла с данными о промокодами
         value_from_enter_modal_menu = ctx.text_values["promo_code"]  # Получение данных введенных в TextInput под id "promo_code" в модальном меню
         user_id = ctx.author.id
 
@@ -57,7 +57,7 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
 
                 connection.close()
 
-                user_codes = handlers.string_to_list(activated_promo_codes_list_var)
+                user_codes = utils.string_to_list(activated_promo_codes_list_var)
                 flag = False
                 for code in user_codes:
                     if value_from_enter_modal_menu == code:
@@ -86,7 +86,7 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
                     if promo_codes_data[promo_code_type][value_from_enter_modal_menu]["count_for_use"] < 1:
                         return await ctx.send("Этот промокод больше нельзя использовать.", ephemeral=True)
                     promo_codes_data[promo_code_type][value_from_enter_modal_menu]["count_for_use"] -= 1
-                    handlers.write_json("data/promo_codes.json", promo_codes_data)
+                    utils.write_json("data/promo_codes.json", promo_codes_data)
 
                 connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
                 cursor = connection.cursor()

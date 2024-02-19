@@ -3,9 +3,8 @@ from disnake.ext import commands
 from disnake import Localized
 
 from ssbot import BOT
-from cogs.hadlers import bot_choices, handlers
-from cogs.view.service_select import ServiceSelectView
-from cogs.view.buttons.continue_button import ContinueButton
+from cogs.hadlers import bot_choices, utils
+# from cogs.view.buttons.continue_button import ContinueButton
 from cogs.view.buttons.take_request import TakeRequestButton
 
 
@@ -109,7 +108,7 @@ class ClientCommands(commands.Cog):
         ]
     )
     async def archive(self, ctx, product_name: str, request_type: str):
-        color = handlers.color_archive_request(request_type)
+        color = utils.color_archive_request(request_type)
         channel = BOT.get_channel(BOT.BOT_CONFIG["request_channel_id"])
 
         embed = disnake.Embed(title="Новый запрос:", color=color)

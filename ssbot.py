@@ -1,7 +1,7 @@
 import disnake, sqlite3, os
 from disnake.ext import commands
 
-from cogs.hadlers.handlers import read_json
+from cogs.hadlers.utils import read_json
 
 #####################################
 #                                   #
@@ -36,8 +36,15 @@ class SSBot(commands.Bot):  # main класс бота
     TEXTURE = "Текстура блока/предмета"
     LETTER_LOGO = "Буквенный логотип"
     LETTER_LOGO_2 = "Логотип с кастомными буквами/доп. деталями"
+    ANIM_LETTER_LOGO = "Анимированный буквенный логотип"
+    BLENDER_RENDER = "Обработка в Blender"
     CHARACTERS_DESIGN = "Дизайн персонажей"
+    JAVA_CODE = "Java код"
     SPIGOT_PLUGIN = "Spigot плагин"
+    FORGE_MOD = "Forge мод"
+    WORLD_GENERATION = "Генерация мира"
+    JIGSAW_STRUCTURE = "Jigsaw структура"
+    STRUCTURE = "Постройка"
     NOT_STATIC_PRICE = (MODEL, ANIM_MODEL, TEXTURE_MODEL, ANIM_TEXTURE_MODEL, LETTER_LOGO_2, SPIGOT_PLUGIN)
 
     def __init__(self):

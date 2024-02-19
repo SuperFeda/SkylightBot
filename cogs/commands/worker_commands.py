@@ -2,7 +2,7 @@ import disnake, sqlite3
 from disnake.ext import commands
 
 from ssbot import BOT, SSBot
-from cogs.hadlers import handlers
+from cogs.hadlers import utils
 
 
 class WorkerCommands(commands.Cog):
@@ -44,7 +44,7 @@ nbt.display.Name=SuperFeda
 
         try:
             if promo_code is not None:
-                var_worker_salary_new = int(var_worker_salary) + int(handlers.calc_percentage(promo_code, salary))
+                var_worker_salary_new = int(var_worker_salary) + int(utils.calc_percentage(promo_code, salary))
             else:
                 var_worker_salary_new = int(var_worker_salary) + salary
         except TypeError:
