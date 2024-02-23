@@ -124,10 +124,9 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
             if var_telegram_url != "" and var_telegram_url is not None:
                 order_embed.add_field(name=f'Telegram: {var_telegram_url}', value="", inline=False)
 
-        if not ctx.author.avatar or ctx.author.avatar is None:
-            order_embed.set_author(name=var_client_display_name)
-        else:
-            order_embed.set_author(name=var_client_display_name, icon_url=var_client_avatar)
+        avatar = utils.get_avatar(ctx_user_avatar=ctx.author.avatar)
+
+        order_embed.set_author(name=var_client_display_name, icon_url=avatar)
 
         if var_youtube_promo_code_counter is not None:
             if var_youtube_promo_code_counter < 1:

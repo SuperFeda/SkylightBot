@@ -20,8 +20,9 @@ class SSBot(commands.Bot):  # main класс бота
     BOT_CONFIG = read_json("./data/bot_config.json")
     PATH_TO_CLIENT_DB = "data/skylightbot_client_base.db"
     PATH_TO_WORKER_DB = "data/skylightbot_worker_base.db"
-    PATH_TO_PROMO_CODES_DATA = "data\\promo_codes.json"
+    PATH_TO_PROMO_CODES_DATA = "data/promo_codes.json"
     PATH_TO_CODES = "data/codes.json"
+    BOT_LOGS_PATH = "data/ssbot_logs.log"
     DEFAULT_COLOR = disnake.Color.from_rgb(43, 45, 49)
     SKIN64 = "Скин 64x64"
     SKIN128 = "Скин 128x128"
@@ -73,8 +74,12 @@ def load_cogs():  # def для загрузки когов бота
         if filename.endswith(".py"):
             BOT.load_extension(f'cogs.view.modals_menu.{filename[:-3]}')
 
+    # load select menus
+    for filename in os.listdir("./cogs/view/select_menus"):
+        if filename.endswith(".py"):
+            BOT.load_extension(f'cogs.view.select_menus.{filename[:-3]}')
+
     BOT.load_extension("cogs.events")  # load bot events
-    BOT.load_extension("cogs.view.service_select")  # load ServiceSelect menu
 
 
 connection = sqlite3.connect('./data/skylightbot_worker_base.db')

@@ -1,10 +1,9 @@
-import disnake, sqlite3, json
+import disnake, sqlite3
 from disnake.ext import commands
 from disnake import Localized
 
-from ssbot import BOT, SSBot
+from ssbot import SSBot
 from cogs.hadlers import utils, bot_choices
-from cogs.view.buttons.order_message_buttons import OrderMessageButtons
 
 
 class OwnerCommands(commands.Cog):
@@ -12,16 +11,16 @@ class OwnerCommands(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.slash_command(name="panel_summon")
-    async def panel_summon(self, ctx):
-        if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-            return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
-
-        ORDER_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["order_channel_id"])
-
-        embed = disnake.Embed(title="Здароу, я SkylightBot", color=disnake.Color.blurple())
-        embed.add_field(name="С моей помощью вы сможете полностью оформить заказ: выбор услуги и описание - со всем этим буду помогать я.\nДля начала заполнения нажмите на кнопку \"Оформить заказ\".", value="")
-        await ORDER_CHANNEL.send(embed=embed, view=OrderMessageButtons(self.client))
+    # @commands.slash_command(name="panel_summon")
+    # async def panel_summon(self, ctx):
+    #     if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
+    #         return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
+    #
+    #     ORDER_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["order_channel_id"])
+    #
+    #     embed = disnake.Embed(title="Здароу, я SkylightBot", color=disnake.Color.blurple())
+    #     embed.add_field(name="С моей помощью вы сможете полностью оформить заказ: выбор услуги и описание - со всем этим буду помогать я.\nДля начала заполнения нажмите на кнопку \"Оформить заказ\".", value="")
+    #     await ORDER_CHANNEL.send(embed=embed, view=OrderMessageButtons(self.client))
 
     @commands.slash_command(name="get_salary_list")
     async def get_salary_list(self, ctx):

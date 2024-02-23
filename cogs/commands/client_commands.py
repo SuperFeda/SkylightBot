@@ -110,12 +110,13 @@ class ClientCommands(commands.Cog):
     async def archive(self, ctx, product_name: str, request_type: str):
         color = utils.color_archive_request(request_type)
         channel = BOT.get_channel(BOT.BOT_CONFIG["request_channel_id"])
+        avatar = utils.get_avatar(ctx_user_avatar=ctx.author.avatar)
 
         embed = disnake.Embed(title="Новый запрос:", color=color)
         embed.add_field(name="Имя продукта:", value=product_name, inline=False)
         embed.add_field(name="Тип запроса:", value=request_type, inline=False)
         embed.add_field(name="ID запрашивающего:", value=ctx.author.id, inline=False)
-        embed.set_author(name=f"{ctx.author.display_name} // {ctx.author.name}", icon_url=ctx.author.avatar)
+        embed.set_author(name=f"{ctx.author.display_name} // {ctx.author.name}", icon_url=avatar)
 
         await ctx.send("Ваш запрос отправлен.", ephemeral=True)
         await channel.send(embed=embed, view=TakeRequestButton(bot=self.bot))

@@ -113,7 +113,7 @@ class ContinueAndAdtConButtons(disnake.ui.View):
 
         embed = disnake.Embed(title="Проверка содержимого заказа", color=disnake.Color.blurple())
         embed.add_field(
-            name="Проверьте данные и запомните код заказа.\n**В тексте доната *ОБЯЗАТЕЛЬНО* напишите ваш Discord ник и код заказа, в ином случае заказ не будет выполнен.**\n\nСвязаться с нами: **skylightservice64@gmail.com**.",
+            name="Проверьте данные и запомните код заказа.\n**В тексте доната *ОБЯЗАТЕЛЬНО* напишите ваш Discord ник и код заказа, в ином случае заказ не будет выполнен.**",
             value="", inline=False
         )
 

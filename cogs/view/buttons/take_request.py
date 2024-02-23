@@ -1,6 +1,8 @@
 import disnake, sqlite3
 
 from disnake.ext import commands
+
+from cogs.hadlers import utils
 from ssbot import SSBot
 
 
@@ -38,6 +40,7 @@ class TakeRequestButton(disnake.ui.View):
         product_name_from_embed = for_in_embed(in_=message.embeds[0]._fields[0].items())
         category = disnake.utils.get(interaction.guild.categories, id=SSBot.BOT_CONFIG["requests_category_id"])
         client = interaction.guild.get_member(int(client_id_from_embed))
+        avatar = utils.get_avatar(ctx_user_avatar=interaction.author.avatar)
 
         if interaction.author.id == client_id_from_embed:
             permissions = {
@@ -59,7 +62,7 @@ class TakeRequestButton(disnake.ui.View):
         embed = message.embeds[0]
         embed.set_footer(
             text=f"Запрос принял {interaction.author.display_name}",
-            icon_url=interaction.author.avatar
+            icon_url=avatar
         )
         await message.edit(embed=embed, view=None)
 

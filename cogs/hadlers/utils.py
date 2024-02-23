@@ -34,7 +34,9 @@ def string_to_list(string: str) -> list:
 
 # calculate percentage of discount for price
 def calc_percentage(promo_code: str, price: int):
-    promo_codes_json = read_json(path="data\\promo_codes.json")
+    from ssbot import SSBot
+
+    promo_codes_json = read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)
     if len(promo_code) == 10:
         return price - (price * promo_codes_json["common_code"][promo_code]["discount_rate"] / 100)
     elif len(promo_code) == 17:
@@ -86,6 +88,24 @@ def get_files(path: str) -> list:
         picture_for_send.append(disnake.File(path+f"{image_for_send}"))
 
     return picture_for_send
+
+
+# get user avatar func
+def get_avatar(ctx_user_avatar):
+    if not ctx_user_avatar:
+        avatar = None
+    else:
+        avatar = ctx_user_avatar
+
+    return avatar
+
+
+# def for create template of embed
+def create_embed(title: str, color: disnake.Color, content: str):
+    embed = disnake.Embed(title=title, color=color)
+    embed.add_field(name=content, value="")
+
+    return embed
 
 
 # no use

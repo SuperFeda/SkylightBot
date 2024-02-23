@@ -9,6 +9,10 @@
     "report_channel_id": 1184406094907453440,
     "log_channel_id": 1169903921792286771,
     "request_channel_id": 1193817240626286592,
+    "user_agreement_channel_id": 1169299255597469696,
+    "feedback_channel_id": 1130088521718300682,
+    "support_channel_id": 1210506311599390750,
+    "questions_channel_id": 1210548926021763103,
 
     "bot_can_take_order": true
 }

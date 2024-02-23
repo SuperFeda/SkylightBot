@@ -38,18 +38,7 @@ class TakeOrder(disnake.ui.View):
         client_order_message = await ctx.channel.fetch_message(ctx.message.id)
         service_type_from_embed = for_in_embed(in_=client_order_message.embeds[0]._fields[1].items())  # getting client service type from embed
         client_id_from_embed = for_in_embed(in_=client_order_message.embeds[0]._fields[2].items())  # getting client id from his order embed
-
-        # client_id_from_embed = None
-        # for key_, value_ in client_order_message.embeds[0]._fields[1].items():  # getting client id from his order embed
-        #     if key_ == "value":
-        #         client_id_from_embed = value_
-        #         break
-        #
-        # service_type_from_embed = None
-        # for key_, value_ in client_order_message.embeds[0]._fields[2].items():  # getting client service type from embed
-        #     if key_ == "value":
-        #         service_type_from_embed = value_
-        #         break
+        avatar = utils.get_avatar(ctx_user_avatar=ctx.author.avatar)
 
         enter_promo_code_from_embed = None
         flag, flag_2 = False, False
@@ -132,7 +121,7 @@ class TakeOrder(disnake.ui.View):
         embed = client_order_message.embeds[0]
         embed.set_footer(
             text=f"Заказ принял: {ctx.author.display_name}",
-            icon_url=ctx.author.avatar
+            icon_url=avatar
         )
 
         await channel.send(f"<@{ctx.author.id}> \n<@{int(client_id_from_embed)}>")
