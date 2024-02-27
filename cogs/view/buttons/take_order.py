@@ -33,8 +33,8 @@ class TakeOrder(disnake.ui.View):
 
     @disnake.ui.button(label="Принять", style=disnake.ButtonStyle.green, custom_id="take_order_button")
     async def take_order_button(self, button: disnake.ui.Button, ctx):
-        category = disnake.utils.get(ctx.guild.categories, id=SSBot.BOT_CONFIG["orders_category_id"])
         worker_id = ctx.author.id
+        category = disnake.utils.get(ctx.guild.categories, id=SSBot.BOT_CONFIG["orders_category_id"])
         client_order_message = await ctx.channel.fetch_message(ctx.message.id)
         service_type_from_embed = for_in_embed(in_=client_order_message.embeds[0]._fields[1].items())  # getting client service type from embed
         client_id_from_embed = for_in_embed(in_=client_order_message.embeds[0]._fields[2].items())  # getting client id from his order embed
@@ -103,12 +103,12 @@ class TakeOrder(disnake.ui.View):
 
         if ctx.author.id == int(client_id_from_embed):
             permissions = {
-                ctx.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False),
+                ctx.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False, send_messages=False),
                 ctx.author: disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True)
             }
         else:
             permissions = {
-                ctx.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False),
+                ctx.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False, send_messages=False),
                 ctx.author: disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True),
                 ctx.guild.get_member(int(client_id_from_embed)): disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True)
             }

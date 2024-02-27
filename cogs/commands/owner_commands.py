@@ -11,21 +11,11 @@ class OwnerCommands(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    # @commands.slash_command(name="panel_summon")
-    # async def panel_summon(self, ctx):
-    #     if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-    #         return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
-    #
-    #     ORDER_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["order_channel_id"])
-    #
-    #     embed = disnake.Embed(title="Здароу, я SkylightBot", color=disnake.Color.blurple())
-    #     embed.add_field(name="С моей помощью вы сможете полностью оформить заказ: выбор услуги и описание - со всем этим буду помогать я.\nДля начала заполнения нажмите на кнопку \"Оформить заказ\".", value="")
-    #     await ORDER_CHANNEL.send(embed=embed, view=OrderMessageButtons(self.client))
-
     @commands.slash_command(name="get_salary_list")
     async def get_salary_list(self, ctx):
-        if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-            return await ctx.send("У вас нет прав на использование этой команды", ephemeral=True)
+        if ctx.author.name != SSBot.BOT_CONFIG["owner_name"] and ctx.author.id != SSBot.BOT_CONFIG["owner_id"]:
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
@@ -41,8 +31,9 @@ class OwnerCommands(commands.Cog):
 
     @commands.slash_command(name="reset_all_workers_salary")
     async def reset_all_workers_salary(self, ctx):
-        if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-            return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
+        if ctx.author.name != SSBot.BOT_CONFIG["owner_name"] and ctx.author.id != SSBot.BOT_CONFIG["owner_id"]:
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
@@ -51,7 +42,7 @@ class OwnerCommands(commands.Cog):
         connection.close()
 
         for item in result:
-            connection = sqlite3.connect('./data/skylightbot_worker_base.db')
+            connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
             cursor = connection.cursor()
             user_id = item[0]
             cursor.execute(
@@ -61,16 +52,19 @@ class OwnerCommands(commands.Cog):
             connection.commit()
             connection.close()
 
-        await ctx.send("Зарплаты аннулированы.", ephemeral=True)
+        embed = utils.create_embed(title="База данных обновлена", color=SSBot.DEFAULT_COLOR, content="Зарплаты аннулированы.")
+        await ctx.send(embed=embed, ephemeral=True)
 
     @commands.slash_command(name="edit_one_worker_salary")
     async def edit_one_worker_salary(self, ctx, worker: disnake.Member, salary: int):
-        if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-            return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
+        if ctx.author.name != SSBot.BOT_CONFIG["owner_name"] and ctx.author.id != SSBot.BOT_CONFIG["owner_id"]:
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
+
+        user_id = worker.id
 
         connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
-        user_id = worker.id
         cursor.execute("SELECT worker_salary FROM settings WHERE user_id=?", (user_id,))
         result = cursor.fetchone()
         var_worker_salary = result[0] if result else None
@@ -78,7 +72,6 @@ class OwnerCommands(commands.Cog):
 
         connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
-        user_id = worker.id
         cursor.execute(
             "INSERT INTO settings (user_id, worker_salary) VALUES (?, ?) ON CONFLICT(user_id) DO UPDATE SET worker_salary=?",
             (user_id, salary, salary)
@@ -86,17 +79,23 @@ class OwnerCommands(commands.Cog):
         connection.commit()
         connection.close()
 
-        await ctx.send(f"Зарплата для {worker.display_name} изменена с {var_worker_salary}₽ на {salary}₽", ephemeral=True)
+        avatar = utils.get_avatar(worker.avatar.url)
+
+        embed = (disnake.Embed(title="Зарплата изменена", color=disnake.Color.blurple())
+                 .set_author(name=worker.display_name, icon_url=avatar)
+                 .add_field(name=f"Зарплата для {worker.display_name} изменена с {var_worker_salary}₽ на {salary}₽", value=""))
+
+        await ctx.send(embed=embed, ephemeral=True)
 
     @commands.slash_command(name="edit_all_worker_salary")
-    async def edit_all_worker_salary(self, ctx, salary: int, sure: bool = commands.Param(
-        choices=bot_choices.CHOICE_FOR_SURE, description=Localized("Are you sure?", key="edit_all_worker_salary.sure.description")
-                )):
-        if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-            return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
+    async def edit_all_worker_salary(self, ctx, salary: int, sure: bool = commands.Param(choices=bot_choices.CHOICE_FOR_SURE, description=Localized("Are you sure?", key="edit_all_worker_salary.sure.description"))):
+        if ctx.author.name != SSBot.BOT_CONFIG["owner_name"] and ctx.author.id != SSBot.BOT_CONFIG["owner_id"]:
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         if sure is False or sure is None:
-            return await ctx.send(f"{sure = }", ephemeral=True)
+            embed = utils.create_embed(title="Отказано", color=disnake.Color.red(), content=f"{sure = }")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
@@ -123,21 +122,23 @@ class OwnerCommands(commands.Cog):
 
     @commands.slash_command(name="for_delete")
     async def for_delete(self, ctx):
-        if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-            return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
+        if ctx.author.name != SSBot.BOT_CONFIG["owner_name"] and ctx.author.id != SSBot.BOT_CONFIG["owner_id"]:
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         await ctx.channel.purge()
 
     @commands.slash_command(name="add_promo_code")
     async def add_promo_code(self, ctx, promo_code_name: str, discount_rate: int, count: int | None = None, pc_type: str = commands.Param(choices=bot_choices.CHOICE_FOR_PC_TYPE)):
-        if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-            return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
+        if ctx.author.name != SSBot.BOT_CONFIG["owner_name"] and ctx.author.id != SSBot.BOT_CONFIG["owner_id"]:
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
-        pc_data = utils.read_json(path="data\\promo_codes.json")
+        pc_data = utils.read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)
 
         if pc_type == "common_code":
             if len(promo_code_name) != 10:
-                return await ctx.send("Промокод для категории \"common_code\" должен иметь длинну в 10 символов!", ephemeral=True)
+                return await ctx.send("Промокод для категории \"common_code\" должен иметь длину в 10 символов!", ephemeral=True)
             if discount_rate > 99:
                 return await ctx.send("`discount_rate` должен быть не больше 99%!", ephemeral=True)
             if count is not None:
@@ -149,7 +150,7 @@ class OwnerCommands(commands.Cog):
 
         elif pc_type == "youtube_code":
             if len(promo_code_name) != 17:
-                return await ctx.send("Промокод для категории \"youtube_code\" должен иметь длинну в 17 символов!", ephemeral=True)
+                return await ctx.send("Промокод для категории \"youtube_code\" должен иметь длину в 17 символов!", ephemeral=True)
             if count is None:
                 return await ctx.send("Для промокода типа \"youtube_code\" параметр \"count\" - обязателен!", ephemeral=True)
             if count < 2:
@@ -161,25 +162,43 @@ class OwnerCommands(commands.Cog):
 
             pc_data["youtube_code"].update({promo_code_name: {"discount_rate": discount_rate, "count": count-1}})
 
-        utils.write_json(path="data\\promo_codes.json", data=pc_data)
+        utils.write_json(path=SSBot.PATH_TO_PROMO_CODES_DATA, data=pc_data)
 
-        await ctx.send(f"Промокод **{promo_code_name}** добавлен в базу данных в категорию \"{pc_type}\".", ephemeral=True)
+        embed = utils.create_embed(title="Промокод добавлен", color=disnake.Color.blurple(), content=f"Промокод **{promo_code_name}** добавлен в базу данных в категорию \"{pc_type}\".")
+
+        await ctx.send(embed=embed, ephemeral=True)
 
     @commands.slash_command(name="remove_promo_code")
     async def remove_promo_code(self, ctx, promo_code_name: str, pc_type: str = commands.Param(choices=bot_choices.CHOICE_FOR_PC_TYPE)):
-        if ctx.author.name != "superfeda" and ctx.author.id != 875246294044643371:
-            return await ctx.send("У вас нет прав на использование этой команды.", ephemeral=True)
+        if ctx.author.name != SSBot.BOT_CONFIG["owner_name"] and ctx.author.id != SSBot.BOT_CONFIG["owner_id"]:
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
-        pc_data = utils.read_json(path="data\\promo_codes.json")
+        pc_data = utils.read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)
         pc_data[pc_type].pop(promo_code_name)
-        utils.write_json(path="data\\promo_codes.json", data=pc_data)
+        utils.write_json(path=SSBot.PATH_TO_PROMO_CODES_DATA, data=pc_data)
 
-        await ctx.send(f"Промокод {promo_code_name} удален из базы данных.", ephemeral=True)
+        embed = utils.create_embed(title="Промокод удален", color=disnake.Color.red(), content=f"Промокод {promo_code_name} удален из базы данных.")
+
+        await ctx.send(embed=embed, ephemeral=True)
 
     @commands.slash_command(name="stop_take_order")
-    async def take_order_order(self, ctx, true_false: bool = commands.Param(choices=bot_choices.CHOICE_FOR_SURE)):
+    async def stop_take_order(self, ctx, true_false: bool = commands.Param(choices=bot_choices.CHOICE_FOR_SURE)):
+        if ctx.author.name != SSBot.BOT_CONFIG["owner_name"] and ctx.author.id != SSBot.BOT_CONFIG["owner_id"]:
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
+
         SSBot.BOT_CONFIG["bot_can_take_order"] = true_false
-        await ctx.send(f"bot_can_take_order заменено на {true_false}.", ephemeral=True)
+
+        color = None
+        if true_false is True:
+            color = disnake.Color.blurple()
+        elif true_false is False:
+            color = disnake.Color.red()
+
+        embed = utils.create_embed(title="bot_can_take_order изменен", color=color, content=f"bot_can_take_order изменен на `{true_false}`.")
+
+        await ctx.send(embed=embed, ephemeral=True)
 
 
 def setup(client):

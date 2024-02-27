@@ -27,8 +27,8 @@ class BotEvents(commands.Cog):
         support_embed = disnake.Embed(title="Поддержка", color=disnake.Color.blurple())
         support_embed.add_field(name="Тут я попытаюсь ответить на все вопросы, которые могли появится у вас во время работы с сервисом.\nВыберите интересующую вас тему в списке ниже:", value="")
 
-        await SUPPORT_CHANNEL.send(embed=support_embed, view=QuestionSelectView(self.client))
-        await ORDER_CHANNEL.send(embed=order_embed, view=OrderMessageButtons(self.client))
+        # await SUPPORT_CHANNEL.send(embed=support_embed, view=QuestionSelectView(self.client))
+        # await ORDER_CHANNEL.send(embed=order_embed, view=OrderMessageButtons(self.client))
 
     @commands.Cog.listener()
     async def on_message(self, message):

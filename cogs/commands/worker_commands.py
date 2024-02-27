@@ -12,7 +12,8 @@ class WorkerCommands(commands.Cog):
     @commands.slash_command(name="rp_guide")
     async def rp_guide(self, ctx):
         if disnake.utils.get(ctx.guild.roles, id=SSBot.BOT_CONFIG["worker_role_id"]) not in ctx.author.roles:
-            return await ctx.send("У вас нет прав на использование данной команды.", ephemeral=True)
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         await ctx.send("""
         `ss_default_totem_pack` - Пример РП для замены текстуры тотема по умолчанию. Просто закиньте новую текстуру в `assets/minecraft/textures/item/` и назовите файл `totem_of_undying`. Предварительно удалив старую текстуру.
@@ -30,7 +31,8 @@ nbt.display.Name=SuperFeda
     @commands.slash_command(name="add_salary")
     async def add_salary(self, ctx, salary: int, promo_code: str | None = None):
         if disnake.utils.get(ctx.guild.roles, id=SSBot.BOT_CONFIG["worker_role_id"]) not in ctx.author.roles:
-            return await ctx.send("У вас нет прав на использование данной команды.", ephemeral=True)
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         user_id = ctx.author.id
         LOG_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["log_channel_id"])
@@ -48,10 +50,8 @@ nbt.display.Name=SuperFeda
             else:
                 var_worker_salary_new = int(var_worker_salary) + salary
         except TypeError:
-            return await ctx.send(
-                "**Произошла ошибка.**\nПохоже, что вас ещё нет с базе сотрудников SS. Для того чтобы попасть туда примите хотя бы один заказ.",
-                ephemeral=True
-            )
+            embed = utils.create_embed(title="Ошибка", color=disnake.Color.red(), content="Похоже, что вас ещё нет с базе сотрудников SS. Для того чтобы попасть туда примите хотя бы один заказ.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         connection_ = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor_ = connection_.cursor()
@@ -62,28 +62,28 @@ nbt.display.Name=SuperFeda
         connection_.commit()
         connection_.close()
 
-        await ctx.send(
-            f"Кол-во добавленной зарплаты: {salary}₽.\nТекущая зарплата: {var_worker_salary_new}₽.",
-            ephemeral=True
-        )
-        await LOG_CHANNEL.send(
-            f"{ctx.author.display_name} ({ctx.author.name}) **добавил себе {salary}₽** в зарплату.\n\nТекущая зарплата: {var_worker_salary_new}₽;\nЗарплата до: {var_worker_salary}₽;\nКанал в котором была введена команда: <#{ctx.channel.id}>;"
-        )
+        embed = utils.create_embed(title="Зарплата добавлена", color=disnake.Color.blurple(), content=f"Кол-во добавленной зарплаты: {salary}₽.\nТекущая зарплата: {var_worker_salary_new}₽.")
+        log_embed = disnake.Embed(title="Добавление зарплаты", description=f"{ctx.author.display_name} ({ctx.author.name}) **добавил себе {salary}₽** в зарплату.\n\nТекущая зарплата: {var_worker_salary_new}₽;\nЗарплата до: {var_worker_salary}₽;\nКанал в котором была введена команда: <#{ctx.channel.id}>;")
+
+        await ctx.send(embed=embed, ephemeral=True)
+        await LOG_CHANNEL.send(embed=log_embed)
 
     @commands.slash_command(name="check_my_salary")
     async def check_my_salary(self, ctx):
         if disnake.utils.get(ctx.guild.roles, id=SSBot.BOT_CONFIG["worker_role_id"]) not in ctx.author.roles:
-            return await ctx.send("У вас нет прав на использование данной команды.", ephemeral=True)
+            embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(), content="У вас нет прав на использование этой команды.")
+            return await ctx.send(embed=embed, ephemeral=True)
 
         connection = sqlite3.connect(SSBot.PATH_TO_WORKER_DB)
         cursor = connection.cursor()
-        user_id = ctx.author.id
-        cursor.execute("SELECT worker_salary FROM settings WHERE user_id=?", (user_id,))
+        cursor.execute("SELECT worker_salary FROM settings WHERE user_id=?", (ctx.author.id,))
         result = cursor.fetchone()
         var_worker_salary = result[0] if result else None
         connection.close()
 
-        await ctx.send(f"Ваша зарплата: {var_worker_salary}₽", ephemeral=True)
+        embed = utils.create_embed(title="Данные о зарплате", color=disnake.Color.blurple(), content=f"Ваша зарплата: {var_worker_salary}₽")
+
+        await ctx.send(embed=embed, ephemeral=True)
 
 
 def setup(bot):

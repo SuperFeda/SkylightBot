@@ -1,5 +1,6 @@
 {
     "worker_role_id": 1130086992999354388,
+    "manager_role_id": 1210555723189325824,
 
     "orders_category_id": 1159115812586668144,
     "requests_category_id": 1193829128449830932,
@@ -13,6 +14,10 @@
     "feedback_channel_id": 1130088521718300682,
     "support_channel_id": 1210506311599390750,
     "questions_channel_id": 1210548926021763103,
+    "services_channel_id": 1130088587661148290,
+
+    "owner_id": 875246294044643371,
+    "owner_name": "superfeda",
 
     "bot_can_take_order": true
 }

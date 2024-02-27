@@ -1,4 +1,4 @@
-import disnake, json, datetime, sqlite3
+import disnake, json, datetime, sqlite3, pytz
 from disnake.ext import commands
 
 from ssbot import SSBot
@@ -66,13 +66,15 @@ class ServiceSelect(disnake.ui.StringSelect):
             with open(SSBot.PATH_TO_CODES, 'w') as file:  # сохранение файла с кодами заказа
                 json.dump(codes, file)
 
-            current_time = datetime.datetime.now()
-            order_code = combination.replace("}", "").replace("{", "")
-            order_time = current_time.strftime("%d.%m.%Y")  # получение даты оформления заказа
+            moscow_tz = pytz.timezone('Europe/Moscow')
+            current_time = datetime.datetime.now(tz=moscow_tz)
+            order_time = current_time.strftime("%d.%m.%Y %H:%M")  # получение даты оформления заказа
+
+            order_code = combination.replace("}", "").replace("{", "")  # Получение кода заказа
 
             connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
             cursor = connection.cursor()
-            cursor.execute("SELECT activated_promo_codes_list FROM settings WHERE user_id=?", (ctx.author.id,))
+            cursor.execute("SELECT activated_promo_codes_list FROM settings WHERE user_id=?", (user_id,))
             result = cursor.fetchone()
             activated_promo_codes_list_var = result[0] if result else None
             connection.close()

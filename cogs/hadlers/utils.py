@@ -1,4 +1,5 @@
 import string, random, os, numpy, json, disnake
+
 from colorama import Fore
 
 
@@ -52,7 +53,7 @@ def generate_random_combination(length: int):
 
 
 # select color for order
-def color_order(var: vars):
+def color_order(var: str):
     from ssbot import SSBot
 
     if var in (SSBot.SKIN64, SSBot.SKIN128, SSBot.SKIN_4D):
@@ -109,7 +110,7 @@ def create_embed(title: str, color: disnake.Color, content: str):
 
 
 # no use
-def delete_files_from_cache(*, author_name):
+def delete_files_from_cache(author_name):
     for file in os.listdir(f"cache/{author_name}/"):
         os.remove(f"cache/{author_name}/{file}")
     os.rmdir(f"cache/{author_name}")

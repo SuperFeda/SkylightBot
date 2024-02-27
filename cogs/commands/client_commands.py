@@ -1,10 +1,9 @@
-import disnake, sqlite3
+import disnake
 from disnake.ext import commands
 from disnake import Localized
 
-from ssbot import BOT
+from ssbot import BOT, SSBot
 from cogs.hadlers import bot_choices, utils
-# from cogs.view.buttons.continue_button import ContinueButton
 from cogs.view.buttons.take_request import TakeRequestButton
 
 
@@ -22,15 +21,17 @@ class ClientCommands(commands.Cog):
     )
     async def send_report(self, ctx, message: str, report_type: str):
         REPORT_CHANNEL = BOT.get_channel(BOT.BOT_CONFIG["report_channel_id"])
+        avatar = utils.get_avatar(ctx.author.avatar)
 
-        await ctx.send("Репорт отправлен", ephemeral=True)
+        embed = utils.create_embed(title="Репорт отправлен", color=SSBot.DEFAULT_COLOR, content="Ваша жалоба была отправлена менеджерам.")
 
-        embed = disnake.Embed(title="Репорт:")
-        embed.add_field(name=f"Тип репорта: {report_type}", value="", inline=False)
-        embed.add_field(name=f"Сообщение: {message}", value='', inline=False)
-        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar)
+        report_embed = disnake.Embed(title="Репорт:", color=SSBot.DEFAULT_COLOR)
+        report_embed.add_field(name=f"Тип репорта: {report_type}", value="", inline=False)
+        report_embed.add_field(name=f"Сообщение: {message}", value='', inline=False)
+        report_embed.set_author(name=ctx.author.display_name, icon_url=avatar)
 
-        await REPORT_CHANNEL.send(embed=embed)
+        await ctx.send(embed=embed, ephemeral=True)
+        await REPORT_CHANNEL.send(embed=report_embed)
 
     # @commands.slash_command(
     #     name=Localized("additional_contacts", key="additional_contacts.display_name"),
@@ -112,14 +113,16 @@ class ClientCommands(commands.Cog):
         channel = BOT.get_channel(BOT.BOT_CONFIG["request_channel_id"])
         avatar = utils.get_avatar(ctx_user_avatar=ctx.author.avatar)
 
-        embed = disnake.Embed(title="Новый запрос:", color=color)
-        embed.add_field(name="Имя продукта:", value=product_name, inline=False)
-        embed.add_field(name="Тип запроса:", value=request_type, inline=False)
-        embed.add_field(name="ID запрашивающего:", value=ctx.author.id, inline=False)
-        embed.set_author(name=f"{ctx.author.display_name} // {ctx.author.name}", icon_url=avatar)
+        embed = utils.create_embed(title="Запрос отправлен", color=SSBot.DEFAULT_COLOR, content="Ваш запрос был отправлен, скоро с вами свяжутся.")
 
-        await ctx.send("Ваш запрос отправлен.", ephemeral=True)
-        await channel.send(embed=embed, view=TakeRequestButton(bot=self.bot))
+        archive_embed = disnake.Embed(title="Новый запрос:", color=color)
+        archive_embed.add_field(name="Имя продукта:", value=product_name, inline=False)
+        archive_embed.add_field(name="Тип запроса:", value=request_type, inline=False)
+        archive_embed.add_field(name="ID запрашивающего:", value=ctx.author.id, inline=False)
+        archive_embed.set_author(name=f"{ctx.author.display_name} // {ctx.author.name}", icon_url=avatar)
+
+        await ctx.send(embed=embed, ephemeral=True)
+        await channel.send(embed=archive_embed, view=TakeRequestButton(bot=self.bot))
 
     # @commands.slash_command(
     #     name=Localized("place_an_order", key="place_an_order.name"),

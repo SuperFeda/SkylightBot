@@ -101,15 +101,9 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
         color = utils.color_order(var_service_type)  # получение цвета для embed
 
         order_embed = disnake.Embed(title='Новый заказ:', color=color)
-        order_embed.add_field(
-            name=f'Код заказа: {var_service_code}\nДата оформления: {var_sending_time}\nИмя заказчика: {var_client_display_name} (tag: {var_client_name})',
-            value=""
-        )
-
+        order_embed.add_field(name=f'Код заказа: {var_service_code}\nДата оформления: {var_sending_time} (МСК / GMT+3)\nИмя заказчика: {var_client_display_name} (tag: {var_client_name})', value="")
         order_embed.add_field(name='Услуга:', value=var_service_type, inline=False)
-
         order_embed.add_field(name='ID заказчика:', value=var_client_id, inline=False)
-
         order_embed.add_field(name="Описание:", value=var_service_description, inline=False)
 
         if var_active_promo_code is not None:
@@ -172,10 +166,10 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
             cash_for_pay = f"\nТ.к. вы использовали промокод {var_active_promo_code} на скидку {percentage}%, то оплата будет в резмере {int(utils.calc_percentage(promo_code=var_active_promo_code, price=dicts.SERVICE_PRICES[var_service_type]))}₽."
 
         if var_service_type in SSBot.NOT_STATIC_PRICE:
-            pay_message = "Ваш заказ был отправлен сотрудникам SkylightServices."
+            pay_message = "Ваш заказ был отправлен мастерам SkylightServices. Скоро с вами свяжется один из мастеров."  # Добавить уведомление о том, что с заказчиком скоро свяжутся
             cash_for_pay = "\nСсылку для оплаты вам предоставят после связи с сотрудником."
         else:
-            pay_message = "Ваш заказ был отправлен сотрудникам SkylightServices.\nСсылка для оплаты: https://www.donationalerts.com/r/skylightservice ."
+            pay_message = "Ваш заказ был отправлен сотрудникам SkylightServices. Скоро с вами свяжется один из мастеров.\nСсылка для оплаты: https://www.donationalerts.com/r/skylightservice ."
 
         embed = disnake.Embed(title="Заказ отправлен", color=disnake.Color.blurple())
         embed.add_field(name="".join([pay_message, cash_for_pay]), value="")

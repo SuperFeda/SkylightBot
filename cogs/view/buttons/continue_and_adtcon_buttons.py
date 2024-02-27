@@ -2,7 +2,7 @@ import disnake, sqlite3
 
 from disnake.ext import commands
 
-from ssbot import BOT, SSBot
+from ssbot import SSBot
 from cogs.hadlers import utils
 from cogs.view.buttons.donation_and_promo_code_buttons import DonationAndPromoCodeButtons
 from cogs.view.modals_menu.additional_contacts import AdditionalContactsMenu
@@ -25,8 +25,6 @@ class ContinueAndAdtConButtons(disnake.ui.View):
 
     @disnake.ui.button(label="Продолжить", style=disnake.ButtonStyle.green, custom_id="continue_button")
     async def continue_button(self, button: disnake.ui.Button, interaction: disnake.MessageInteraction):
-        channel = BOT.get_channel(1130521980936921200)  # 1130092027942555740 - order channel id
-
         connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
         cursor = connection.cursor()
         user_id = interaction.author.id
@@ -35,11 +33,6 @@ class ContinueAndAdtConButtons(disnake.ui.View):
         cursor.execute("SELECT client_name FROM settings WHERE user_id=?", (user_id,))
         result = cursor.fetchone()
         var_client_name = result[0] if result else None
-
-        # find client id
-        cursor.execute("SELECT client_id FROM settings WHERE user_id=?", (user_id,))
-        result = cursor.fetchone()
-        var_client_id = result[0] if result else None
 
         # find client avatar
         cursor.execute("SELECT client_avatar FROM settings WHERE user_id=?", (user_id,))
@@ -86,13 +79,12 @@ class ContinueAndAdtConButtons(disnake.ui.View):
         result = cursor.fetchone()
         var_telegram_url = result[0] if result else None
 
+        connection.close()
+
         color = utils.color_order(var_service_type)
 
         order_embed = disnake.Embed(title='Ваш заказ:', color=color)
-        order_embed.add_field(
-            name=f'Код заказа: {var_service_code}\nДата оформления: {var_sending_time}\nИмя заказчика: {var_client_display_name} (tag: {var_client_name})\nУслуга: {var_service_type}',
-            value=""
-        )
+        order_embed.add_field(name=f'Код заказа: {var_service_code}\nДата оформления: {var_sending_time} (МСК / GMT+3)\nИмя заказчика: {var_client_display_name} (tag: {var_client_name})\nУслуга: {var_service_type}', value="")
         order_embed.add_field(name="Описание:", value=var_service_description, inline=False)
 
         if var_mail != "" and var_mail is not None or var_vk_url != "" and var_vk_url is not None or var_telegram_url != "" and var_telegram_url is not None:
@@ -109,13 +101,8 @@ class ContinueAndAdtConButtons(disnake.ui.View):
         else:
             order_embed.set_author(name=var_client_display_name, icon_url=var_client_avatar)
 
-        connection.close()
-
         embed = disnake.Embed(title="Проверка содержимого заказа", color=disnake.Color.blurple())
-        embed.add_field(
-            name="Проверьте данные и запомните код заказа.\n**В тексте доната *ОБЯЗАТЕЛЬНО* напишите ваш Discord ник и код заказа, в ином случае заказ не будет выполнен.**",
-            value="", inline=False
-        )
+        embed.add_field(name="Проверьте данные и запомните код заказа.\n**В тексте доната *ОБЯЗАТЕЛЬНО* напишите ваш Discord ник и код заказа, в ином случае заказ не будет выполнен.**", value="", inline=False)
 
         try:
             async with interaction.channel.typing():

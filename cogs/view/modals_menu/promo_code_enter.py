@@ -22,7 +22,7 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
         self.bot = bot
         super().__init__(
             title="Ввод промокода", custom_id="promo_code_enter",
-            timeout=150.0, components=[
+            timeout=200.0, components=[
                 disnake.ui.TextInput(
                     label="Промокод",
                     placeholder="Введите промокод",
@@ -47,10 +47,12 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
                 connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
                 cursor = connection.cursor()
 
+                # Получение значения, которое говорит, есть ли уже активный промокод у мембера или нет
                 cursor.execute("SELECT promo_code_activated FROM settings WHERE user_id=?", (user_id,))
                 result = cursor.fetchone()
                 promo_code_activated_var = result[0] if result else None
 
+                # Найти список с веденными промокодами
                 cursor.execute("SELECT activated_promo_codes_list FROM settings WHERE user_id=?", (user_id,))
                 result = cursor.fetchone()
                 activated_promo_codes_list_var = result[0] if result else None
@@ -112,8 +114,8 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
                 connection.commit()
                 connection.close()
 
-                promocode_activated = utils.create_embed(title="Промокод активирован", color=SSBot.DEFAULT_COLOR, content=f"Промокод {value_from_enter_modal_menu} успешно активирован.")
-            await ctx.send(embed=promocode_activated)
+                promo_code_activated = utils.create_embed(title="Промокод активирован", color=SSBot.DEFAULT_COLOR, content=f"Промокод {value_from_enter_modal_menu} успешно активирован.")
+            await ctx.send(embed=promo_code_activated)
 
         else:
             embed = utils.create_embed(title="Промокод недействителен", color=disnake.Color.red(), content="Такого промокода нету в базе данных.")

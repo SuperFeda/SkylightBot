@@ -10,7 +10,8 @@ from cogs.hadlers.utils import read_json
 # Python 3.10                       #
 # disnake 2.9.1                     #
 # colorama 0.4.6                    #
-# numpy 1.25.2                      #
+# numpy 1.26.4                      #
+# pytz 2024.1                       #
 #                                   #
 #####################################
 
@@ -22,7 +23,7 @@ class SSBot(commands.Bot):  # main класс бота
     PATH_TO_WORKER_DB = "data/skylightbot_worker_base.db"
     PATH_TO_PROMO_CODES_DATA = "data/promo_codes.json"
     PATH_TO_CODES = "data/codes.json"
-    BOT_LOGS_PATH = "data/ssbot_logs.log"
+    PATH_TO_BOT_LOGS = "data/ssbot_logs.log"
     DEFAULT_COLOR = disnake.Color.from_rgb(43, 45, 49)
     SKIN64 = "Скин 64x64"
     SKIN128 = "Скин 128x128"

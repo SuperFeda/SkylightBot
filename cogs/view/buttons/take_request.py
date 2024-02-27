@@ -1,4 +1,4 @@
-import disnake, sqlite3
+import disnake
 
 from disnake.ext import commands
 
@@ -44,12 +44,12 @@ class TakeRequestButton(disnake.ui.View):
 
         if interaction.author.id == client_id_from_embed:
             permissions = {
-                interaction.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False),
+                interaction.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False, send_messages=False),
                 interaction.author: disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True)
             }
         else:
             permissions = {
-                interaction.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False),
+                interaction.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False, send_messages=False),
                 interaction.author: disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True),
                 client: disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True)
             }
