@@ -1,11 +1,16 @@
 import disnake
+
 from disnake.ext import commands
 from disnake import Localized
+from typing import List
 
 from ssbot import SSBot, BOT
-from cogs.hadlers import utils
+from cogs.hadlers import utils, dicts
 from cogs.view.buttons.order_message_buttons import OrderMessageButtons
 from cogs.view.select_menus.question_select import QuestionSelectView
+
+
+
 
 
 class ManagerCommands(commands.Cog):
@@ -44,43 +49,58 @@ class ManagerCommands(commands.Cog):
             embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(),  content="У вас нет прав на использование этой команды.")
             return await ctx.send(embed=embed, ephemeral=True)
 
+        SERVICES_CHANNEL = BOT.get_channel(1211977678023036958)
+
     @commands.slash_command(name="update_services_list")
     async def update_services_list(self, ctx):
         if disnake.utils.get(ctx.guild.roles, id=SSBot.BOT_CONFIG["manager_role_id"]) not in ctx.author.roles:
             embed = utils.create_embed(title="Не достаточно прав", color=disnake.Color.red(),  content="У вас нет прав на использование этой команды.")
             return await ctx.send(embed=embed, ephemeral=True)
 
-        async with ctx.channel.typing():
-            SERVICES_CHANNEL = BOT.get_channel(1211977678023036958)  # test services channel
-            # SERVICES_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["services_channel_id"])
-            # applied_tags=["Логотип"],
+        await ctx.response.defer(ephemeral=True)
 
-            # Создание страницы с услугой "Буквенный логотип"
-            icon = disnake.File("images/services_icons/logo_icon.png", filename="logo_icon.jpg")
-            embed = disnake.Embed(title="Буквенный логотип", color=disnake.Color.blurple())
-            embed.add_field(name="**Цена: 249₽**\n\nОтличная вещь для оформления сервера или страницы скачивания мода.\n\n:arrow_down: Примеры работ ниже :arrow_down:", value=f'\n\n(Оформить заказ можно здесь: <#{SSBot.BOT_CONFIG["order_channel_id"]}>', inline=False)
-            embed.set_image(url="attachment://logo_icon.jpg")
+        SERVICES_CHANNEL = BOT.get_channel(1211977678023036958)  # test services channel
+        # SERVICES_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["services_channel_id"])
+        # applied_tags=["Логотип"],
 
-            LETTER_LOGO_MESSAGE = await SERVICES_CHANNEL.create_thread(name="Буквенный логотип", embed=embed, file=icon)
-            LETTER_LOGO_THREAD = BOT.get_channel(LETTER_LOGO_MESSAGE.thread.id)
+        # Создание страницы с услугой "Буквенный логотип"
+        await self.create_service_post(
+            service_channel=SERVICES_CHANNEL,
+            thread_name="Буквенный логотип",
+            icon_path="images/services_icons/logo_icon.png",
+            icon_name="logo_icon.jpg",
+            embed_title="Буквенный логотип",
+            embed_field_name=f'Цена: {dicts.SERVICE_PRICES[SSBot.LETTER_LOGO]}₽\n\nОтличная вещь для оформления сервера или страницы скачивания мода.\n\n(Оформить заказ можно здесь: <#{SSBot.BOT_CONFIG["order_channel_id"]}>) ',
+            embed_field_value=':arrow_down::arrow_down: ***Примеры работ ниже*** :arrow_down::arrow_down:',
+            examples=[disnake.File("images/services_work_examples/logo_example.png")]
+        )
 
-            await LETTER_LOGO_THREAD.send(file=disnake.File("images/services_work_examples/logo_example.png"))
+        # Создание страницы с услугой "Скин 64х64"
+        await self.create_service_post(
+            service_channel=SERVICES_CHANNEL,
+            thread_name="Скин 64х64",
+            icon_path="images/services_icons/skin_icon.png",
+            icon_name="skin_icon.jpg",
+            embed_title="Скин 64х64",
+            embed_field_name=f'Цена: {dicts.SERVICE_PRICES[SSBot.SKIN64]}₽\n\nНадоели обычные Стив и Алекс? Новые скины тоже успели надоесть? Тогда мы поможем вам создать уникальный дизайн для вашего скина.\n\n(Оформить заказ можно здесь: <#{SSBot.BOT_CONFIG["order_channel_id"]}>) ',
+            embed_field_value=':arrow_down::arrow_down: ***Примеры работ ниже*** :arrow_down::arrow_down:',
+            examples=[disnake.File("images/services_work_examples/skins_example.png")]
+        )
 
-            # Создание страницы с услугой "Скин 64х64"
-            icon = disnake.File("images/services_icons/skin_icon.png", filename="skin_icon.jpg")
-            embed = disnake.Embed(title="Буквенный логотип", color=disnake.Color.blurple())
-            embed.add_field(name="**Цена: 280₽**\n\nНадоели обычные Стив и Алекс? Новые скины тоже успели надоесть? Тогда мы поможем вам создать уникальный дизайн для вашего скина.\n\n:arrow_down: Примеры работ ниже :arrow_down:", value=f'\n\n(Оформить заказ можно здесь: <#{SSBot.BOT_CONFIG["order_channel_id"]}>', inline=False)
-            embed.set_image(url="attachment://skin_icon.jpg")
+        await ctx.edit_original_message("test")
 
-            SKIN_MESSAGE = await SERVICES_CHANNEL.create_thread(name="Скин 64х64", embed=embed, file=icon)
-            SKIN_THREAD = BOT.get_channel(SKIN_MESSAGE.thread.id)
+    async def create_service_post(self, *, service_channel: disnake.ForumChannel, thread_name: str, icon_path: str,
+                                  icon_name: str, embed_title: str, embed_field_name: str, embed_field_value: str,
+                                  examples: list[disnake.File]) -> None:
+        icon = disnake.File(icon_path, filename=icon_name)
+        embed = disnake.Embed(title=embed_title, color=disnake.Color.blurple())
+        embed.add_field(name=embed_field_name, value=embed_field_value, inline=False)
+        embed.set_image(url=f"attachment://{icon_name}")
 
-            await SKIN_THREAD.send(file=disnake.File("images/services_work_examples/skins_example.png"))
-            
-            # InteractionTimedOut: Interaction took more than 3 seconds to be responded to. Please defer it using "interaction.response.defer" on the start of your command. Later you may send a response by editing the deferred message using "interaction.edit_original_response"
-            # Note: This might also be caused by a misconfiguration in the components make sure you do not respond twice in case this is a component.
+        THREAD_MESSAGE = await service_channel.create_thread(name=thread_name, embed=embed, file=icon)
+        THREAD = BOT.get_channel(THREAD_MESSAGE.thread.id)
 
-        await ctx.send("b", ephemeral=True)
+        await THREAD.send("Примеры работ:", files=examples)
 
 
 def setup(bot):

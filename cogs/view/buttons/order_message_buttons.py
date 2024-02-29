@@ -20,7 +20,8 @@ class OrderMessageButtons(disnake.ui.View):
     def __init__(self, bot):
         self.bot = bot
         super().__init__(timeout=None)
-        self.add_item(disnake.ui.Button(label="Поддержать", url="https://www.donationalerts.com/r/skylightproduction", row=1))
+        self.support_button = disnake.ui.Button(label="Поддержать", url="https://www.donationalerts.com/r/skylightproduction", row=1)
+        self.add_item(self.support_button)
 
     @disnake.ui.button(label="Оформить заказ", style=disnake.ButtonStyle.blurple, custom_id="order_button", row=0)
     async def order_button(self, button: disnake.ui.Button, ctx):  # ctx: disnake.AppCmdInter

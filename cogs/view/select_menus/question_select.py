@@ -75,7 +75,7 @@ class QuestionSelect(disnake.ui.StringSelect):
             embed = disnake.Embed(
                 title="Обратная связь",
                 color=SSBot.DEFAULT_COLOR,
-                description='Для связи с нами вы можете использовать электронную почту: **skylightservice64@gmail.com**.\nЛибо вы можете нажать на кнопку \"Связаться здесь\" под этим сообщением и через время создаться приватная ветка с менеджером.'
+                description='Для связи с нами вы можете использовать электронную почту: **skylightservice64@gmail.com**.\nЛибо вы можете нажать на кнопку \"Связаться здесь\" под этим сообщением и через время менеджер свяжется с вами.'
             )
 
             await ctx.send(embed=embed, view=ContactHereButton(self.bot), ephemeral=True)

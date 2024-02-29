@@ -5,6 +5,7 @@ from colorama import Fore
 from ssbot import BOT, SSBot
 from cogs.hadlers import utils
 from cogs.view.select_menus.question_select import QuestionSelectView
+from cogs.view.buttons.write_description_again_button import EnterDescriptionAgainButton
 from cogs.view.buttons.order_message_buttons import OrderMessageButtons
 from cogs.view.buttons.continue_and_adtcon_buttons import ContinueAndAdtConButtons
 
@@ -32,11 +33,22 @@ class BotEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        # pictures, files_banned_embed, warning_message = None, None, None
-        pictures = None
-        embed_for_send = []
+        connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
+        cursor = connection.cursor()
+        cursor.execute("SELECT can_description FROM settings WHERE user_id=?", (message.author.id,))
+        result = cursor.fetchone()
+        can_description_var = result[0] if result else None
+        connection.close()
 
         if message.channel.type is disnake.ChannelType.private_thread and message.author.name in message.channel.name:
+            def is_not_bot(m):
+                return not m.author.bot
+            await message.channel.purge(check=is_not_bot)  # Удаление сообщений в новосозданной ветке
+
+        if can_description_var == 1 or can_description_var is True:
+            pictures = None
+            embed_for_send = []
+
             connection_ = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
             cursor_ = connection_.cursor()
             cursor_.execute(
@@ -46,16 +58,12 @@ class BotEvents(commands.Cog):
             connection_.commit()
             connection_.close()
 
-            def is_not_bot(m):
-                return not m.author.bot
-            await message.channel.purge(check=is_not_bot)  # Удаление сообщений в новосозданной ветке
-
             if len(message.attachments) > 10:
                 embed = utils.create_embed(title="Слишком много изображений", color=disnake.Color.red(), content="Отправить можно максимум 10 изображений.")
-                return await message.channel.send(f"<@{message.author.id}>", embed=embed, delete_after=7)
+                return await message.channel.send(f"<@{message.author.id}>", embed=embed, delete_after=12)
             if len(message.content) > 1020:
                 embed = utils.create_embed(title="Слишком длинное описание", color=disnake.Color.red(), content="Описание должно вмещать в себя до **1020** символов.")
-                return await message.channel.send(f"<@{message.author.id}>", embed=embed, delete_after=7)
+                return await message.channel.send(f"<@{message.author.id}>", embed=embed, delete_after=12)
 
             async with message.channel.typing():
                 if message.author.name in os.listdir("cache/"):  # если папка с именем пользователя уже есть в папке с кешем, то удалить ее и ее содержимое
@@ -67,7 +75,7 @@ class BotEvents(commands.Cog):
                     value=f"**{message.content}**", inline=False
                 )
                 desc.add_field(
-                    name="При наличии ошибок повторно отправьте текст с описанием.\n\nЕсли вы можете предоставить дополнительные контакты для связи то нажмите на кнопку \"Доп. контакты\"",
+                    name="При наличиии ошибок в тексте или если забыли что-то дописать, то нажмите на кнопку \"Ввести повторно\".\n\nЕсли вы можете предоставить дополнительные контакты для связи то нажмите на кнопку \"Доп. контакты\"",
                     value="", inline=False
                 )
                 embed_for_send.append(desc)
@@ -107,19 +115,27 @@ class BotEvents(commands.Cog):
 
                     pictures = utils.get_files(f"cache/{message.author.name}/")  # получение сохраненных фотографий из кеша
 
-            await message.channel.send(embeds=embed_for_send, files=pictures, view=ContinueAndAdtConButtons(self.client))
+            connection_ = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
+            cursor_ = connection_.cursor()
+            cursor_.execute(
+                "INSERT INTO settings (user_id, can_description) VALUES (?, ?) ON CONFLICT(user_id) DO UPDATE SET can_description=?",
+                (message.author.id, False, False)
+            )
+            connection_.commit()
+            connection_.close()
 
-        BANNED_CHANNELS = [
-            1169299255597469696, 1130088587661148290, 1130088521718300682,
-            1130087805553475634, 1130091204546150441, 1130091606620524554,
-            1130092027942555740, 1130498251167105085, 1130108061550399518,
-            1130521980936921200, 1130087595993468979, 1130086029743890516,
-            1130091118760034385, 1130090840145022977, 1130086029743890517
-        ]  # список каналов из которых не нужно записывать логи (сообщения юзеров)
+            components_list = [
+                EnterDescriptionAgainButton(self.client).enter_desc_button,
+                ContinueAndAdtConButtons(self.client).continue_button,
+                ContinueAndAdtConButtons(self.client).additional_contacts_button
+            ]
+
+            await message.channel.send(embeds=embed_for_send, files=pictures, components=components_list)
+
         LOG_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["log_channel_id"])
 
-        if message.author != BOT.user:                 # отправка сообщений от всех пользователей в LOG_CHANNEL, если id канала, где
-            if message.channel.id in BANNED_CHANNELS:  # было опубликованно сообщение не находится в banned_channels и автор сообщения не SSBot
+        if message.author != BOT.user:                                        # отправка сообщений от всех пользователей в LOG_CHANNEL, если id канала, где
+            if message.channel.id in SSBot.BOT_CONFIG["banned_channels_id"]:  # было опубликованно сообщение не находится в banned_channels и автор сообщения не SSBot
                 return
             avatar = utils.get_avatar(ctx_user_avatar=message.author.avatar.url)
 

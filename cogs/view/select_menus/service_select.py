@@ -3,6 +3,7 @@ from disnake.ext import commands
 
 from ssbot import SSBot
 from cogs.hadlers import utils, dicts
+from cogs.view.buttons.enter_description_button import EnterDescriptionButton
 
 
 class ServiceSelectReg(commands.Cog):
@@ -16,7 +17,8 @@ class ServiceSelectReg(commands.Cog):
 
 
 class ServiceSelect(disnake.ui.StringSelect):
-    def __init__(self):
+    def __init__(self, bot):
+        self.bot = bot
         super().__init__(
             placeholder="Список услуг", min_values=1, max_values=1,
             custom_id="service_select", options=[
@@ -96,33 +98,30 @@ class ServiceSelect(disnake.ui.StringSelect):
             except AttributeError:
                 author_avatar = None
             cursor.execute(
-                "INSERT INTO settings (user_id, client_name, client_id, service_type, service_code, sending_time, client_display_name, client_avatar, mail, vk_url, telegram_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET client_name=?, client_id=?, service_type=?, service_code=?, sending_time=?, client_display_name=?, client_avatar=?, mail=?, vk_url=?, telegram_url=?",
-                (user_id, ctx.author.name, ctx.author.id, self.values[0], order_code, order_time, ctx.author.display_name, author_avatar, None, None, None, ctx.author.name, ctx.author.id, self.values[0], order_code, order_time, ctx.author.display_name, author_avatar, None, None, None)
+                "INSERT INTO settings (user_id, client_name, client_id, service_type, service_code, sending_time, client_display_name, client_avatar, mail, vk_url, telegram_url, can_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET client_name=?, client_id=?, service_type=?, service_code=?, sending_time=?, client_display_name=?, client_avatar=?, mail=?, vk_url=?, telegram_url=?, can_description=?",
+                (user_id, ctx.author.name, ctx.author.id, self.values[0], order_code, order_time, ctx.author.display_name, author_avatar, None, None, None, False, ctx.author.name, ctx.author.id, self.values[0], order_code, order_time, ctx.author.display_name, author_avatar, None, None, None, False)
             )
             connection.commit()
             connection.close()
 
-            embed = disnake.Embed(title="Проверка выбранной услуги и заполнение описания", color=SSBot.DEFAULT_COLOR)
+            embed = disnake.Embed(title="Проверка выбранной услуги", color=SSBot.DEFAULT_COLOR)
             embed.add_field(
                 name=f"Вы выбрали ***{self.values[0]}***. Если вы по ошибке выбрали не ту услугу, то снова откройте список и выберите нужную вам.",
-                value="",
-                inline=False
+                value="", inline=False
             )
             embed.add_field(
-                name="Напишите в чат сообщение с описанием результата. Также вы можете прикрепить исходники в колличестве до 10 штук в форматах: `png`, `jpg`, `jpeg` и `gif`.",
-                value="",
-                inline=False
+                name="Для того, чтобы продолжить оформление заказа и начать описывать ваш желаемый результат, нажмите на кнопку \"Ввод описания\"",
+                value="", inline=False
             )
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, view=EnterDescriptionButton(self.bot))
 
 
 class ServiceSelectView(disnake.ui.View):
-
     def __init__(self, bot):
         self.bot = bot
         super().__init__(timeout=None)
-        self.add_item(ServiceSelect())
+        self.add_item(ServiceSelect(self.bot))
 
 
 def setup(bot):

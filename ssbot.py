@@ -104,7 +104,7 @@ cursor_.execute("""
         client_id,
         client_avatar,
         client_display_name,
-        client_guild_permissions, 
+        can_description,
         activated_promo_codes_list,
         active_promo_code,
         promo_code_activated,
