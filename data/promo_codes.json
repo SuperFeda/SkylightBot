@@ -23,11 +23,10 @@
         },
         "GGTTYY1122SSAA88I": {
             "discount_rate": 22,
-            "count_for_use": 8,
+            "count_for_use": 6,
             "count": 1,
             "users": [
-                422414746591952910,
-                875246294044643371
+                422414746591952910
             ]
         }
     }

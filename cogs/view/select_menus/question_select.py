@@ -1,4 +1,5 @@
 import disnake
+
 from disnake.ext import commands
 
 from cogs.view.buttons.contact_here_button import ContactHereButton
@@ -26,6 +27,7 @@ class QuestionSelect(disnake.ui.StringSelect):
                 # disnake.SelectOption(label="Как устроена оплата?", value="how_pay"),
                 disnake.SelectOption(label="Правки", value="edits"),
                 disnake.SelectOption(label="Доп. контакты связи", value="add_contacts"),
+                disnake.SelectOption(label="Бот выдает ошибку взаимодействия", value="bot_error"),
                 # disnake.SelectOption(label="Как пользоваться архивом?", value="archive"),
                 disnake.SelectOption(label="Как стать сотрудником SkylightServices?", value="ss_worker")
             ]
@@ -55,12 +57,29 @@ class QuestionSelect(disnake.ui.StringSelect):
                 description='Для услуг из категории \"Текстура\" и \"Скин\" правки бесплатные, а для остальных услуг каждая правка стоит 150₽.'
             )
 
+        elif select == "bot_error":
+            flag = False
+
+            file = disnake.File("images/bot_error.png", filename="bot_error.png")
+            embed = disnake.Embed(
+                title="Бот выдает ошибку взаимодействия",
+                color=SSBot.DEFAULT_COLOR,
+                description='Данная ошибка появляется из-за того, что бот не успел обработать запрос за 3 секунды либо по каким-то другим техническим причинам.\nОдной из причин, из-за чего бот не успевает обработать запрос является слабый интернет. Попробуйте временно сократить потребление интернета в доме (например поставить на паузу загрузку игры в Steam) и снова попробовать повзаимодействовать с ботом. А если слабый интерет не временное явление, то попробуйте связаться с нашим менеджером, тогда мы поможем вручную собрать заказ.'
+            ).set_image(url="attachment://bot_error.png")
+
+            await ctx.send(embed=embed, file=file, ephemeral=True)
+
         elif select == "add_contacts":
+            flag = False
+
+            file = disnake.File("images/add_contacts_menu.png", filename="add_contacts_menu.jpg")
             embed = disnake.Embed(
                 title="Дополнительные контакты для связи",
                 color=SSBot.DEFAULT_COLOR,
                 description='Во время оформления заказа я попрошу вас заполнить форму, где вам нужно ввести дополнительные контакты для связи с вами. В этой форме не обязательно заполнять каждую графу, если вы хотите предоставить, скажем, электронную почту, то можете написать только её и продолжить оформление заказа.'
-            ).set_image(url="https://cdn.discordapp.com/attachments/955018176247255091/1210532355530424401/image.png?ex=65eae71c&is=65d8721c&hm=0426921ad5ffbc90baff51e60c7b6fbbef875bb5f7782b0eeb77a33bb726603c&")
+            ).set_image(url="attachment://add_contacts_menu.jpg")
+
+            await ctx.send(embed=embed, file=file, ephemeral=True)
 
         elif select == "archive":
             embed = disnake.Embed(

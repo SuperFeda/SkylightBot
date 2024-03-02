@@ -49,15 +49,18 @@ class OrderMessageButtons(disnake.ui.View):
 
     @disnake.ui.button(label="Пользовательское соглашение", style=disnake.ButtonStyle.green, custom_id="ps_button", row=0)
     async def ps_button(self, button: disnake.ui.Button, ctx):  # ctx: disnake.AppCmdInter
-        async with ctx.channel.typing():
-            embed = utils.create_embed(title="Пользовательское соглашение", color=SSBot.DEFAULT_COLOR, content=f'**Пользовательское соглашение** можно прочитать здесь: <#{SSBot.BOT_CONFIG["user_agreement_channel_id"]}>')
-            await ctx.send(embed=embed, ephemeral=True)
+        embed = utils.create_embed(title="Пользовательское соглашение", color=SSBot.DEFAULT_COLOR, content=f'**Пользовательское соглашение** можно прочитать здесь: <#{SSBot.BOT_CONFIG["user_agreement_channel_id"]}>')
+        await ctx.send(embed=embed, ephemeral=True)
 
     @disnake.ui.button(label="Отзывы", style=disnake.ButtonStyle.green, custom_id="reviews_button", row=0)
     async def reviews_button(self, button: disnake.ui.Button, ctx):  # ctx: disnake.AppCmdInter
-        async with ctx.channel.typing():
-            embed = utils.create_embed(title="Отзывы", color=SSBot.DEFAULT_COLOR, content=f'**Отзывы** можно посмотреть здесь: <#{SSBot.BOT_CONFIG["feedback_channel_id"]}>')
-            await ctx.send(embed=embed, ephemeral=True)
+        embed = utils.create_embed(title="Отзывы", color=SSBot.DEFAULT_COLOR, content=f'**Отзывы** можно посмотреть здесь: <#{SSBot.BOT_CONFIG["feedback_channel_id"]}>')
+        await ctx.send(embed=embed, ephemeral=True)
+
+    # @disnake.ui.button(label="Доп. примеры работ", style=disnake.ButtonStyle.green, custom_id="work_examples_button", row=0)
+    # async def reviews_button(self, button: disnake.ui.Button, ctx):  # ctx: disnake.AppCmdInter
+    #         embed = utils.create_embed(title="Дополнительные примеры работ", color=SSBot.DEFAULT_COLOR, content=f'**Дополнительные примеры работ** можно посмотреть здесь: <#{SSBot.BOT_CONFIG[""]}>')
+    #         await ctx.send(embed=embed, ephemeral=True)
 
     def to_components(self):
         return super().to_components()

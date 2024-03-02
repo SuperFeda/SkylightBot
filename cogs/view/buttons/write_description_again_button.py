@@ -24,7 +24,8 @@ class EnterDescriptionAgainButton(disnake.ui.View):
     async def enter_desc_button(self, button: disnake.ui.Button, ctx):
         embed = disnake.Embed(title="Ввод описания", color=SSBot.DEFAULT_COLOR)
         embed.add_field(
-            name="Напишите в чат сообщение с описанием желаемого результата. Также вы можете прикрепить исходники в количестве до 10 штук в форматах: `png`, `jpg`, `jpeg` и `gif`.", value="", inline=False
+            name="Напишите в чат сообщение с описанием желаемого результата. Также вы можете прикрепить исходники в количестве до 10 штук в форматах: `png`, `jpg`, `jpeg` и `gif`.",
+            value="", inline=False
         )
 
         connection_ = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)

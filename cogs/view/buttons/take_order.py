@@ -37,7 +37,7 @@ class TakeOrder(disnake.ui.View):
         category = disnake.utils.get(ctx.guild.categories, id=SSBot.BOT_CONFIG["orders_category_id"])
         client_order_message = await ctx.channel.fetch_message(ctx.message.id)
         service_type_from_embed = for_in_embed(in_=client_order_message.embeds[0]._fields[1].items())  # getting client service type from embed
-        client_id_from_embed = for_in_embed(in_=client_order_message.embeds[0]._fields[2].items())  # getting client id from his order embed
+        client_id_from_embed = int(for_in_embed(in_=client_order_message.embeds[0]._fields[2].items())) # getting client id from his order embed
         avatar = utils.get_avatar(ctx_user_avatar=ctx.author.avatar)
 
         enter_promo_code_from_embed = None
@@ -101,7 +101,7 @@ class TakeOrder(disnake.ui.View):
             connection_.commit()
             connection_.close()
 
-        if ctx.author.id == int(client_id_from_embed):
+        if ctx.author.id == client_id_from_embed:
             permissions = {
                 ctx.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False, send_messages=False),
                 ctx.author: disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True)
@@ -110,7 +110,7 @@ class TakeOrder(disnake.ui.View):
             permissions = {
                 ctx.guild.default_role: disnake.PermissionOverwrite(read_messages=False, view_channel=False, send_messages=False),
                 ctx.author: disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True),
-                ctx.guild.get_member(int(client_id_from_embed)): disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True)
+                ctx.guild.get_member(client_id_from_embed): disnake.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True)
             }
 
         channel = await ctx.guild.create_text_channel(
@@ -119,12 +119,50 @@ class TakeOrder(disnake.ui.View):
         )
 
         embed = client_order_message.embeds[0]
-        embed.set_footer(
-            text=f"Заказ принял: {ctx.author.display_name}",
-            icon_url=avatar
-        )
+        embed.set_footer(text=f"Заказ принял: {ctx.author.display_name}", icon_url=avatar)
 
-        await channel.send(f"<@{ctx.author.id}> \n<@{int(client_id_from_embed)}>")
+        if service_type_from_embed == SSBot.SKIN64:
+            skin_questions = disnake.Embed(
+                title="Дополнительные вопросы",
+                color=SSBot.DEFAULT_COLOR,
+                description="Для того чтобы мы выполнили ваш заказа так, как хотите вы, нам нужно знать ещё кое-какую информацию. Пожалуйста, ответьте на вопросы ниже:"
+            ).add_field(name="1) Ваш скин должен иметь стандартные руки или тонкие?", value="", inline=False)
+
+            await channel.send(f"<@{client_id_from_embed}> ,", embed=skin_questions)
+
+        elif service_type_from_embed == SSBot.LETTER_LOGO or service_type_from_embed == SSBot.LETTER_LOGO_2:
+            file = disnake.File("images/logos.png", filename="logos.jpg")
+
+            logo_questions = disnake.Embed(
+                title="Дополнительные вопросы",
+                color=SSBot.DEFAULT_COLOR,
+                description="Для того чтобы мы выполнили ваш заказа так, как хотите вы, нам нужно знать ещё кое-какую информацию. Пожалуйста, ответьте на вопросы ниже:"
+            ).add_field(name="1) В логотипе должны быть пробелы между словами?", value="", inline=False).set_image(url=f"attachment://logos.jpg")
+
+            await channel.send(f"<@{client_id_from_embed}> ,", embed=logo_questions, file=file)
+
+        # elif service_type_from_embed == SSBot.TEXTURE:
+        #     texture_questions = disnake.Embed(
+        #         title="Дополнительные вопросы",
+        #         color=SSBot.DEFAULT_COLOR,
+        #         description="Для того чтобы мы выполнили ваш заказа так, как хотите вы, нам нужно знать ещё кое-какую информацию. Пожалуйста, ответьте на вопросы ниже:"
+        #     ).add_field(name="1) Какое должно быть качество у текстуры: 16х16 или 32х32?", value="", inline=False)
+        #
+        #     await channel.send(f"<@{client_id_from_embed}> ,", embed=texture_questions)
+
+        elif service_type_from_embed == SSBot.CHARACTERS_DESIGN:
+            character_questions = disnake.Embed(
+                title="Дополнительные вопросы",
+                color=SSBot.DEFAULT_COLOR,
+                description="Для того чтобы мы выполнили ваш заказа так, как хотите вы, нам нужно знать ещё кое-какую информацию. Пожалуйста, ответьте на вопросы ниже:"
+            ).add_field(name="1) На персонаже должны быть тени?", value="", inline=False).add_field(name="2) У персонажа должен быть контур?", value="", inline=False)
+
+            await channel.send(f"<@{client_id_from_embed}> ,", embed=character_questions)
+
+        else:
+            await channel.send(f"<@{client_id_from_embed}>")
+
+        await channel.send(f"<@{ctx.author.id}>")
         await client_order_message.edit(embed=embed, view=None)
 
     def to_components(self):

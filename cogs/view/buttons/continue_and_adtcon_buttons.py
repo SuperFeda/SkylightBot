@@ -104,9 +104,13 @@ class ContinueAndAdtConButtons(disnake.ui.View):
         embed = disnake.Embed(title="Проверка содержимого заказа", color=disnake.Color.blurple())
         embed.add_field(name="Проверьте данные и запомните код заказа.\n**В тексте доната *ОБЯЗАТЕЛЬНО* напишите ваш Discord ник и код заказа, в ином случае заказ не будет выполнен.**", value="", inline=False)
 
+        button_list = [
+            DonationAndPromoCodeButtons(self.bot).pay_button,
+            DonationAndPromoCodeButtons(self.bot).promo_code_button
+        ]
+
         try:
-            async with interaction.channel.typing():
-                pictures = utils.get_files(f"cache/{interaction.author.name}/")
+            pictures = utils.get_files(f"cache/{interaction.author.name}/")
             await interaction.response.send_message(embeds=[embed, order_embed], files=pictures, view=DonationAndPromoCodeButtons(self.bot))
         except FileNotFoundError:
             await interaction.response.send_message(embeds=[embed, order_embed], view=DonationAndPromoCodeButtons(self.bot))

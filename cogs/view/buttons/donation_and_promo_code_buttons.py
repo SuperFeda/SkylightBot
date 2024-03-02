@@ -1,4 +1,5 @@
 import disnake, sqlite3
+
 from disnake.ext import commands
 
 from ssbot import SSBot, BOT
@@ -25,6 +26,8 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
 
     @disnake.ui.button(label="Оплатить", style=disnake.ButtonStyle.blurple, custom_id="pay_button")
     async def pay_button(self, button: disnake.ui.Button, ctx):
+        button.disabled = True
+
         user_id = ctx.author.id
         WORKER_ORDER_CHANNEL = BOT.get_channel(SSBot.BOT_CONFIG["worker_order_channel_id"])
 
@@ -145,10 +148,11 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
 
         cash_for_pay = ""
         if var_active_promo_code is not None:
-            percentage = 0
             file = utils.read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)
+            len_active_promo_code = len(var_active_promo_code)
+            percentage = 0
 
-            if len(var_active_promo_code) == 10:
+            if len_active_promo_code == 10:
                 connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
                 cursor = connection.cursor()
                 cursor.execute(
@@ -160,10 +164,10 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
 
                 percentage = file["common_code"][var_active_promo_code]["discount_rate"]
 
-            elif len(var_active_promo_code) == 17:
+            elif len_active_promo_code == 17:
                 percentage = file["youtube_code"][var_active_promo_code]["discount_rate"]
 
-            cash_for_pay = f"\nТ.к. вы использовали промокод {var_active_promo_code} на скидку {percentage}%, то оплата будет в резмере {int(utils.calc_percentage(promo_code=var_active_promo_code, price=dicts.SERVICE_PRICES[var_service_type]))}₽."
+            cash_for_pay = f"\nТ.к. вы использовали промокод {var_active_promo_code} на скидку {percentage}%, то оплата будет в размере {int(utils.calc_percentage(promo_code=var_active_promo_code, price=dicts.SERVICE_PRICES[var_service_type]))}₽."
 
         if var_service_type in SSBot.NOT_STATIC_PRICE:
             pay_message = "Ваш заказ был отправлен мастерам SkylightServices. Скоро с вами свяжется один из мастеров."  # Добавить уведомление о том, что с заказчиком скоро свяжутся
@@ -183,6 +187,7 @@ class DonationAndPromoCodeButtons(disnake.ui.View):
         except FileNotFoundError:
             await WORKER_ORDER_CHANNEL.send(embed=order_embed, view=TakeOrder(self.bot))
 
+        await ctx.response.edit_message(view=self)
         await ctx.send(embed=embed)
 
     @disnake.ui.button(label="Ввести промокод", style=disnake.ButtonStyle.blurple, custom_id="promo_code_button")

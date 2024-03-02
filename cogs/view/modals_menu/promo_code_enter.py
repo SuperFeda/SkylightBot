@@ -1,4 +1,5 @@
 import disnake, sqlite3
+
 from disnake.ext import commands
 
 from ssbot import SSBot
@@ -22,7 +23,7 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
         self.bot = bot
         super().__init__(
             title="Ввод промокода", custom_id="promo_code_enter",
-            timeout=200.0, components=[
+            timeout=260.0, components=[
                 disnake.ui.TextInput(
                     label="Промокод",
                     placeholder="Введите промокод",
@@ -36,10 +37,11 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
     async def callback(self, ctx):
         promo_codes_data = utils.read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)  # подгрузка файла с данными о промокодами
         value_from_enter_modal_menu = ctx.text_values["promo_code"]  # Получение данных введенных в TextInput под id "promo_code" в модальном меню
+        len_value_from_enter_modal_menu = len(value_from_enter_modal_menu)
         user_id = ctx.author.id
 
         promo_code_type = "common_code"
-        if len(value_from_enter_modal_menu) == 17:
+        if len_value_from_enter_modal_menu == 17:
             promo_code_type = "youtube_code"
 
         if value_from_enter_modal_menu in promo_codes_data[promo_code_type]:
@@ -66,16 +68,16 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
                         flag = True
                         break
 
+                if promo_code_activated_var is True or promo_code_activated_var == 1:
+                    embed = utils.create_embed(title="Промокод не активирован", color=disnake.Color.red(), content="У вас уже есть активированный промокод.")
+                    return await ctx.send(embed=embed)
                 if flag is True:
                     embed = utils.create_embed(title="Промокод недействителен", color=disnake.Color.red(), content="Данный промокод уже был введён ранее на вашем аккаунте.")
-                    return await ctx.send(embed=embed)
-                if promo_code_activated_var is True:
-                    embed = utils.create_embed(title="Промокод не активирован", color=disnake.Color.red(), content="У вас уже есть активированный промокод.")
                     return await ctx.send(embed=embed)
 
                 youtube_codes_data = None
                 user_can_activate_promo_code_flag = False
-                if len(value_from_enter_modal_menu) == 17:
+                if len_value_from_enter_modal_menu == 17:
                     youtube_codes_data = promo_codes_data["youtube_code"][value_from_enter_modal_menu]["count"]
 
                     if "users" in promo_codes_data["youtube_code"][value_from_enter_modal_menu]:
@@ -92,7 +94,7 @@ class PromoCodeEnterMenu(disnake.ui.Modal):
                         embed = utils.create_embed(title="Промокод недействителен", color=disnake.Color.red(), content="Этот промокод больше нельзя использовать.")
                         return await ctx.send(embed=embed)
                     promo_codes_data[promo_code_type][value_from_enter_modal_menu]["count_for_use"] -= 1
-                    utils.write_json(SSBot.PATH_TO_CODES, promo_codes_data)
+                    utils.write_json(SSBot.PATH_TO_PROMO_CODES_DATA, promo_codes_data)
 
                 connection = sqlite3.connect(SSBot.PATH_TO_CLIENT_DB)
                 cursor = connection.cursor()
