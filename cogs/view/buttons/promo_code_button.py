@@ -1,4 +1,5 @@
 import disnake
+
 from disnake.ext import commands
 
 from cogs.view.modals_menu.promo_code_enter import PromoCodeEnterMenu

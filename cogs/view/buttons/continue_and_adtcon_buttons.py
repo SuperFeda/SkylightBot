@@ -81,7 +81,7 @@ class ContinueAndAdtConButtons(disnake.ui.View):
 
         connection.close()
 
-        color = utils.color_order(var_service_type)
+        color = utils.color_order(var_service_type)  # получение цвета для embed
 
         order_embed = disnake.Embed(title='Ваш заказ:', color=color)
         order_embed.add_field(name=f'Код заказа: {var_service_code}\nДата оформления: {var_sending_time} (МСК / GMT+3)\nИмя заказчика: {var_client_display_name} (tag: {var_client_name})\nУслуга: {var_service_type}', value="")
@@ -104,10 +104,10 @@ class ContinueAndAdtConButtons(disnake.ui.View):
         embed = disnake.Embed(title="Проверка содержимого заказа", color=disnake.Color.blurple())
         embed.add_field(name="Проверьте данные и запомните код заказа.\n**В тексте доната *ОБЯЗАТЕЛЬНО* напишите ваш Discord ник и код заказа, в ином случае заказ не будет выполнен.**", value="", inline=False)
 
-        button_list = [
-            DonationAndPromoCodeButtons(self.bot).pay_button,
-            DonationAndPromoCodeButtons(self.bot).promo_code_button
-        ]
+        # button_list = [
+        #     DonationAndPromoCodeButtons(self.bot).pay_button,
+        #     DonationAndPromoCodeButtons(self.bot).promo_code_button
+        # ]
 
         try:
             pictures = utils.get_files(f"cache/{interaction.author.name}/")

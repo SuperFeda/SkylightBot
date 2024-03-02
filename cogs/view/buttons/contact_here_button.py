@@ -1,4 +1,5 @@
 import disnake
+
 from disnake.ext import commands
 
 from ssbot import SSBot, BOT

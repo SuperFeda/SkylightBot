@@ -1,4 +1,5 @@
 import disnake, json, datetime, sqlite3, pytz
+
 from disnake.ext import commands
 
 from ssbot import SSBot
@@ -56,7 +57,8 @@ class ServiceSelect(disnake.ui.StringSelect):
                 except json.JSONDecodeError:
                     codes = []
 
-            combination = utils.generate_random_combination(10)  # генерация и сохранение кода заказа
+            # генерация и сохранение кода заказа
+            combination = utils.generate_random_combination(10)
             for element in codes:
                 if combination in element:
                     combination = utils.generate_random_combination(10)

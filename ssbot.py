@@ -1,4 +1,5 @@
 import disnake, sqlite3, os
+
 from disnake.ext import commands
 
 from cogs.hadlers.utils import read_json
@@ -24,6 +25,7 @@ class SSBot(commands.Bot):  # main класс бота
     PATH_TO_PROMO_CODES_DATA = "data/promo_codes.json"
     PATH_TO_CODES = "data/codes.json"
     PATH_TO_BOT_LOGS = "data/ssbot_logs.log"
+    ORDER_ID_SYMBOLS = "1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
     DEFAULT_COLOR = disnake.Color.from_rgb(43, 45, 49)
     SKIN64 = "Скин 64x64"
     SKIN128 = "Скин 128x128"

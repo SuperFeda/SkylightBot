@@ -1,4 +1,5 @@
 import disnake, sqlite3
+
 from disnake.ext import commands
 
 from ssbot import SSBot
@@ -71,7 +72,7 @@ class TakeOrder(disnake.ui.View):
             var_worker_salary = result_[0] if result else None
 
             if flag:
-                var_worker_salary = int(var_worker_salary) + utils.calc_percentage(promo_code=enter_promo_code_from_embed, price=dicts.SERVICE_PRICES[service_type_from_embed])
+                var_worker_salary = int(var_worker_salary) + int(utils.calc_percentage(promo_code=enter_promo_code_from_embed, price=dicts.SERVICE_PRICES[service_type_from_embed]))
             else:
                 var_worker_salary = int(var_worker_salary) + dicts.SERVICE_PRICES[service_type_from_embed]
 
@@ -137,7 +138,7 @@ class TakeOrder(disnake.ui.View):
                 title="Дополнительные вопросы",
                 color=SSBot.DEFAULT_COLOR,
                 description="Для того чтобы мы выполнили ваш заказа так, как хотите вы, нам нужно знать ещё кое-какую информацию. Пожалуйста, ответьте на вопросы ниже:"
-            ).add_field(name="1) В логотипе должны быть пробелы между словами?", value="", inline=False).set_image(url=f"attachment://logos.jpg")
+            ).add_field(name="1) В логотипе должны быть пробелы между словами?", value="", inline=False).set_image(url="attachment://logos.jpg")
 
             await channel.send(f"<@{client_id_from_embed}> ,", embed=logo_questions, file=file)
 

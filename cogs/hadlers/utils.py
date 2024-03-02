@@ -1,4 +1,4 @@
-import string, random, os, numpy, json, disnake
+import random, os, numpy, json, disnake
 
 from colorama import Fore
 
@@ -38,9 +38,11 @@ def calc_percentage(promo_code: str, price: int):
     from ssbot import SSBot
 
     promo_codes_json = read_json(path=SSBot.PATH_TO_PROMO_CODES_DATA)
-    if len(promo_code) == 10:
+    len_promo_code = len(promo_code)
+
+    if len_promo_code == 10:
         return price - (price * promo_codes_json["common_code"][promo_code]["discount_rate"] / 100)
-    elif len(promo_code) == 17:
+    elif len_promo_code == 17:
         return price - (price * promo_codes_json["youtube_code"][promo_code]["discount_rate"] / 100)
     else:
         return print(f"{Fore.RED}[ERR]{Fore.RESET} Error in calc_percentage def")
@@ -48,32 +50,33 @@ def calc_percentage(promo_code: str, price: int):
 
 # generate random combination of order id
 def generate_random_combination(length: int):
-    characters = string.ascii_letters + string.digits
-    return ''.join(random.choice(characters) for _ in numpy.arange(length))
+    from ssbot import SSBot
+
+    return ''.join(random.choice(SSBot.ORDER_ID_SYMBOLS) for _ in numpy.arange(length))
 
 
 # select color for order
-def color_order(var: str):
+def color_order(service: str):
     from ssbot import SSBot
 
-    if var in (SSBot.SKIN64, SSBot.SKIN128, SSBot.SKIN_4D):
+    if service in (SSBot.SKIN64, SSBot.SKIN128, SSBot.SKIN_4D):
         return disnake.Color.blue()
-    elif var in (SSBot.MODEL, SSBot.ANIM_MODEL, SSBot.ANIM_TEXTURE_MODEL, SSBot.TEXTURE_MODEL):
+    elif service in (SSBot.MODEL, SSBot.ANIM_MODEL, SSBot.ANIM_TEXTURE_MODEL, SSBot.TEXTURE_MODEL):
         return disnake.Color.brand_red()
-    elif var in (SSBot.CAPE, SSBot.TOTEM, SSBot.TOTEM_3D, SSBot.TEXTURE):
+    elif service in (SSBot.CAPE, SSBot.TOTEM, SSBot.TOTEM_3D, SSBot.TEXTURE):
         return disnake.Color.orange()
-    elif var in (SSBot.LETTER_LOGO, SSBot.LETTER_LOGO_2):
+    elif service in (SSBot.LETTER_LOGO, SSBot.LETTER_LOGO_2):
         return disnake.Color.blurple()
-    elif var in (SSBot.CHARACTERS_DESIGN):
+    elif service in (SSBot.CHARACTERS_DESIGN):
         return disnake.Color.dark_orange()
-    elif var in (SSBot.SPIGOT_PLUGIN):
+    elif service in (SSBot.SPIGOT_PLUGIN, SSBot.WORLD_GENERATION, SSBot.JAVA_CODE, SSBot.JIGSAW_STRUCTURE):
         return disnake.Color.magenta()
     else:
         return disnake.Color.default()
 
 
 # select color for archive request
-def color_archive_request(var: vars):
+def color_archive_request(var: str):
     if var == "покупка":
         return disnake.Color.blue()
     elif var == "предложение":
