@@ -6,8 +6,6 @@ from cogs.hadlers.utils import read_json
 
 #####################################
 #                                   #
-# Самый говнокод из всех говнокодов #
-#                                   #
 # Python 3.10                       #
 # disnake 2.9.1                     #
 # colorama 0.4.6                    #
@@ -143,4 +141,3 @@ BOT.i18n.load("./lang/")  # Подгрузка файлов локализаци
 load_cogs()
 
 BOT.run(os.environ["SSBOT_TOKEN"])
-#BOT.run("MTEzODc2MTE1ODIxMjQ2ODgxNg.GIF6Po.OAJBKFGlAJ-hMm2uI8pij6xb32JLBLNDivTYjw")
