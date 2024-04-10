@@ -9,7 +9,7 @@
 
 **SkylightServies** - Студия основанная мной, нацеленная на выполнение заказов специализированных на Minecraft.
 
-Примеры услуг:
+Список услуг:
 
 <p align="center"><img src="https://github.com/SuperFeda/SkylightBot/assets/112332753/3942b21d-cd8f-450f-99be-73b5c366b2a3"></p>
   
